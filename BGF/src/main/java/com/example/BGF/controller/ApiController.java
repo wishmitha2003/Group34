@@ -54,7 +54,9 @@ public class ApiController {
                                 "fullName", found.getFullName(),
                                 "role", found.getRole(),
                                 "active", found.isActive(),
-                                "available", found.isAvailable()
+                                "available", found.isAvailable(),
+                                "address", found.getAddress(),
+                                "phone", found.getPhone()
                         ));
                         return ResponseEntity.ok(response);
                     } else {
@@ -62,5 +64,55 @@ public class ApiController {
                     }
                 })
                 .orElse(ResponseEntity.badRequest().body("User not found"));
+    }
+
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<?> getProfile(@PathVariable Long userId) {
+        try {
+            User user = userService.getUserProfile(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Return user data without password
+            Map<String, Object> userProfile = new HashMap<>();
+            userProfile.put("id", user.getId());
+            userProfile.put("username", user.getUsername());
+            userProfile.put("email", user.getEmail());
+            userProfile.put("fullName", user.getFullName());
+            userProfile.put("role", user.getRole());
+            userProfile.put("serviceType", user.getServiceType());
+            userProfile.put("address", user.getAddress());
+            userProfile.put("phone", user.getPhone());
+            userProfile.put("active", user.isActive());
+            userProfile.put("available", user.isAvailable());
+            userProfile.put("createdAt", user.getCreatedAt());
+            userProfile.put("updatedAt", user.getUpdatedAt());
+
+            return ResponseEntity.ok(userProfile);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/profile/{userId}")
+    public ResponseEntity<?> updateProfile(@PathVariable Long userId, @RequestBody User updatedUser) {
+        try {
+            User user = userService.updateProfile(userId, updatedUser);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Profile updated successfully");
+            response.put("user", Map.of(
+                    "id", user.getId(),
+                    "username", user.getUsername(),
+                    "email", user.getEmail(),
+                    "fullName", user.getFullName(),
+                    "address", user.getAddress(),
+                    "phone", user.getPhone(),
+                    "available", user.isAvailable()
+            ));
+
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
