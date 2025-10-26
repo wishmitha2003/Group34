@@ -14,21 +14,41 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
+    // Validate input
     if (!username || !password) {
       setError('Please enter both username and password');
       return;
     }
+
+    if (username.length < 3) {
+      setError('Username must be at least 3 characters long');
+      return;
+    }
+
+    if (password.length < 3) {
+      setError('Password must be at least 3 characters long');
+      return;
+    }
+    
     setIsLoading(true);
     try {
       const success = await login(username, password);
       if (success) {
+        // Navigate to home page on successful login
         navigate('/');
       } else {
-        setError('Invalid username or password');
+        setError('Invalid username or password. Please try again.');
       }
     } catch (err) {
-      setError('An error occurred during login');
-      console.error(err);
+      console.error('Login error:', err);
+      if (err.response && err.response.status === 400) {
+        setError('Invalid credentials. Please check your username and password.');
+      } else if (err.code === 'ERR_NETWORK') {
+        setError('Unable to connect to the server. Please check your internet connection.');
+      } else {
+        setError('An error occurred during login. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
