@@ -6,6 +6,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -19,20 +20,20 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
+        HttpSecurity httpSecurity = http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/api/signup", "/api/login").permitAll()
-                        .requestMatchers("/reviews/**").permitAll()
                         .requestMatchers("/api/profile/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/services/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/services/user/**").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/services/user/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/products/**").permitAll()
+                        .requestMatchers("/review/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }
