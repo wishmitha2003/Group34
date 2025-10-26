@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FileText, HeartIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 
@@ -16,6 +17,7 @@ const ProductCard = ({
   remainingStocks
 }) => {
   const [quantity, setQuantity] = useState(1);
+  const navigate = useNavigate();
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
@@ -27,6 +29,10 @@ const ProductCard = ({
     if (quantity > 1) {
       setQuantity(prev => prev - 1);
     }
+  };
+
+  const handleViewDetails = () => {
+    navigate(`/product/${id}`);
   };
 
   const handleAddToCart = () => {
@@ -183,20 +189,15 @@ const ProductCard = ({
       
 
       
-      // Add to Cart button
+      // View Details button
       React.createElement(
         'button',
         {
-          onClick: handleAddToCart,
-          disabled: (remainingStocks || 0) === 0,
-          className: `mt-4 w-full py-2 rounded-md transition-colors flex items-center justify-center ${
-            (remainingStocks || 0) === 0
-              ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700'
-          }`
+          onClick: handleViewDetails,
+          className: 'mt-4 w-full py-2 rounded-md transition-colors flex items-center justify-center bg-blue-600 text-white hover:bg-blue-700'
         },
         React.createElement(FileText, { className: 'h-4 w-4 mr-2' }),
-        (remainingStocks || 0) === 0 ? 'Out of Stock' : 'View Details'
+        'View Details'
       )
     ),
     

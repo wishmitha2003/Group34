@@ -179,16 +179,13 @@ const router = createBrowserRouter([
         index: true, 
         element: <Home /> 
       },
-      { 
-        path: 'categories/:category', 
-        element: <Categories /> 
-      },
+     
       { 
         path: 'categories', 
         element: <Categories /> 
       },
       { 
-        path: 'products/:id', 
+        path: 'product/:id', 
         element: <ProductView /> 
       },
       { 

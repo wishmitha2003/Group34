@@ -1,8 +1,10 @@
 package com.example.BGF.controller;
 
+import com.example.BGF.models.Order;
 import com.example.BGF.models.Product;
 import com.example.BGF.models.User;
 import com.example.BGF.security.JwtUtil;
+import com.example.BGF.service.OrderService;
 import com.example.BGF.service.ProductService;
 import com.example.BGF.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -20,11 +23,13 @@ public class ApiController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final ProductService productService;
+    private final OrderService orderService;
 
-    public ApiController(UserService userService, JwtUtil jwtUtil, ProductService productService) {
+    public ApiController(UserService userService, JwtUtil jwtUtil, ProductService productService, OrderService orderService) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
         this.productService = productService;
+        this.orderService = orderService;
     }
 
     @PostMapping("/signup")
@@ -196,6 +201,80 @@ public class ApiController {
                 return "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80";
             default: 
                 return "https://via.placeholder.com/400x300?text=" + category;
+        }
+    }
+
+    // ==== ORDER ENDPOINTS ====
+
+    // Create a new order
+    @PostMapping("/orders")
+    public ResponseEntity<?> createOrder(@RequestBody Map<String, Object> orderRequest) {
+        try {
+            Long userId = Long.valueOf(orderRequest.get("userId").toString());
+            Long productId = Long.valueOf(orderRequest.get("productId").toString());
+            Integer quantity = Integer.valueOf(orderRequest.get("quantity").toString());
+            String shippingAddress = (String) orderRequest.get("shippingAddress");
+            String paymentMethod = (String) orderRequest.get("paymentMethod");
+            String notes = (String) orderRequest.get("notes");
+
+            Order order = orderService.createOrder(userId, productId, quantity, shippingAddress, paymentMethod, notes);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Order created successfully");
+            response.put("orderId", order.getId());
+            response.put("order", order);
+            
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Order creation failed: " + e.getMessage());
+        }
+    }
+
+    // Get order by ID
+    @GetMapping("/orders/{orderId}")
+    public ResponseEntity<?> getOrderById(@PathVariable Long orderId) {
+        Optional<Order> order = orderService.getOrderById(orderId);
+        return order.map(ResponseEntity::ok)
+                   .orElse(ResponseEntity.notFound().build());
+    }
+
+    // Get orders by user ID
+    @GetMapping("/orders/user/{userId}")
+    public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable Long userId) {
+        List<Order> orders = orderService.getOrdersByUser(new User() {{ setId(userId); }});
+        return ResponseEntity.ok(orders);
+    }
+
+    // Get all orders (admin)
+    @GetMapping("/orders")
+    public ResponseEntity<List<Order>> getAllOrders() {
+        List<Order> orders = orderService.getAllOrders();
+        return ResponseEntity.ok(orders);
+    }
+
+    // Update order status
+    @PutMapping("/orders/{orderId}/status")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Long orderId, @RequestBody Map<String, String> statusUpdate) {
+        try {
+            String status = statusUpdate.get("status");
+            Order updatedOrder = orderService.updateOrderStatus(orderId, status);
+            return ResponseEntity.ok(updatedOrder);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Status update failed: " + e.getMessage());
+        }
+    }
+
+    // Cancel order
+    @PutMapping("/orders/{orderId}/cancel")
+    public ResponseEntity<?> cancelOrder(@PathVariable Long orderId) {
+        try {
+            Order cancelledOrder = orderService.cancelOrder(orderId);
+            return ResponseEntity.ok(Map.of(
+                "message", "Order cancelled successfully",
+                "order", cancelledOrder
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Order cancellation failed: " + e.getMessage());
         }
     }
 }

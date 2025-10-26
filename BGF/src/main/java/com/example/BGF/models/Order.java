@@ -2,7 +2,6 @@ package com.example.BGF.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -11,16 +10,45 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private LocalDateTime orderDate = LocalDateTime.now();
 
-    private String status; // e.g., PENDING, COMPLETED, CANCELLED
+    @Column(nullable = false)
+    private String status = "PENDING"; // PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user; // The user who placed the order
+    private User user;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> orderItems;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "product_id", nullable = false)
+    private AppService product; // Reference to AppService (product)
+
+    @Column(nullable = false)
+    private Integer quantity;
+
+    @Column(nullable = false)
+    private Double price; // Price at time of order
+
+    @Column(nullable = false)
+    private Double totalAmount; // quantity * price
+
+    private String shippingAddress;
+    private String paymentMethod;
+    private String notes;
+
+    // Constructors
+    public Order() {}
+
+    public Order(User user, AppService product, Integer quantity, Double price) {
+        this.user = user;
+        this.product = product;
+        this.quantity = quantity;
+        this.price = price;
+        this.totalAmount = quantity * price;
+        this.orderDate = LocalDateTime.now();
+        this.status = "PENDING";
+    }
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -35,11 +63,34 @@ public class Order {
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 
-    public List<OrderItem> getOrderItems() { return orderItems; }
-    public void setOrderItems(List<OrderItem> orderItems) {
-        this.orderItems = orderItems;
-        if(orderItems != null) {
-            orderItems.forEach(item -> item.setOrder(this));
+    public AppService getProduct() { return product; }
+    public void setProduct(AppService product) { this.product = product; }
+
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { 
+        this.quantity = quantity;
+        if (this.price != null) {
+            this.totalAmount = quantity * this.price;
         }
     }
+
+    public Double getPrice() { return price; }
+    public void setPrice(Double price) { 
+        this.price = price;
+        if (this.quantity != null) {
+            this.totalAmount = this.quantity * price;
+        }
+    }
+
+    public Double getTotalAmount() { return totalAmount; }
+    public void setTotalAmount(Double totalAmount) { this.totalAmount = totalAmount; }
+
+    public String getShippingAddress() { return shippingAddress; }
+    public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }
+
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 }
