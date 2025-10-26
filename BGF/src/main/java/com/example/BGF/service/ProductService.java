@@ -20,9 +20,10 @@ public class ProductService {
         if (product.getName() == null || product.getName().isBlank()) {
             throw new IllegalArgumentException("Product name cannot be empty");
         }
-        product.setAdmin(admin);
+        product.setAdmin(admin);  // sets the admin from the token
         return productRepository.save(product);
     }
+
 
     // Read all
     public List<Product> getAllProducts() {
