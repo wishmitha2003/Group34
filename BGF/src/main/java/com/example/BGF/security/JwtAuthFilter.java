@@ -38,6 +38,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 String username = jwtUtil.extractUsername(token);
                 String role = jwtUtil.extractRole(token);
 
+                System.out.println("JWT Filter - Username: " + username + ", Role: " + role);
+
                 // Fetch User from DB
                 User user = userRepository.findByUsername(username)
                         .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -46,15 +48,21 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 user.setPassword(null);
 
                 // Set authentication with User as principal
+                // Ensure role has ROLE_ prefix for Spring Security
+                String authorityRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+                System.out.println("JWT Filter - Authority Role: " + authorityRole);
+                
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(user, null,
-                                Collections.singleton(() -> role));
+                                Collections.singleton(() -> authorityRole));
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+                System.out.println("JWT Filter - Authentication set successfully for user: " + username);
 
             } catch (Exception e) {
                 System.out.println("Invalid JWT: " + e.getMessage());
+                e.printStackTrace();
             }
         }
         filterChain.doFilter(request, response);
