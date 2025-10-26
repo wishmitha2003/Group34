@@ -64,8 +64,9 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Spring Boot.BgfApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;#1 on wishmitha's-branch&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Ovindu's-Branch&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -73,6 +74,7 @@
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -88,8 +90,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.23892.409" />
-        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-IU-252.23892.409" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26199.169" />
       </set>
     </attachedChunks>
   </component>
@@ -112,6 +113,15 @@
       <workItem from="1760853120603" duration="64000" />
       <workItem from="1760885429470" duration="1463000" />
       <workItem from="1761316335684" duration="872000" />
+      <workItem from="1761320889289" duration="77000" />
+      <workItem from="1761321090043" duration="99000" />
+      <workItem from="1761321213807" duration="90000" />
+      <workItem from="1761321694341" duration="319000" />
+      <workItem from="1761322051507" duration="174000" />
+      <workItem from="1761322263269" duration="445000" />
+      <workItem from="1761484717416" duration="165000" />
+      <workItem from="1761485157569" duration="151000" />
+      <workItem from="1761485484726" duration="282000" />
     </task>
     <task id="LOCAL-00001" summary="order process">
       <option name="closed" value="true" />
