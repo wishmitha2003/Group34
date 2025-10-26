@@ -1,20 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
-import { products, categories } from '../data/products';
+import productService from '../services/productService';
 import { FilterIcon, SearchIcon } from 'lucide-react';
 
 const Categories = () => {
   const { category } = useParams();
   const navigate = useNavigate();
+  const [allProducts, setAllProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 300000]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState('featured');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const currentCategory = categories.find(cat => cat.slug === category);
+
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [productsData, categoriesData] = await Promise.all([
+          productService.getAllProducts(),
+          productService.getAllCategories()
+        ]);
+        
+        setAllProducts(productsData);
+        setCategories(categoriesData);
+        setError(null);
+      } catch (err) {
+        setError('Failed to load products. Please try again later.');
+        console.error('Error fetching data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Update selected categories when URL parameter changes
   useEffect(() => {
@@ -26,7 +54,7 @@ const Categories = () => {
   }, [category]);
 
   useEffect(() => {
-    let filtered = products;
+    let filtered = allProducts;
 
     // Filter by selected categories
     if (selectedCategories.length > 0) {
@@ -64,7 +92,7 @@ const Categories = () => {
     }
 
     setFilteredProducts(filtered);
-  }, [selectedCategories, searchTerm, priceRange, sortOption]);
+  }, [allProducts, selectedCategories, searchTerm, priceRange, sortOption]);
 
   const handleCategoryChange = (categorySlug) => {
     if (selectedCategories.includes(categorySlug)) {
@@ -85,6 +113,40 @@ const Categories = () => {
     setSortOption('featured');
     navigate('/categories');
   };
+
+  // Loading state
+  if (loading) {
+    return React.createElement(
+      'div',
+      { className: 'container mx-auto px-4 py-8 text-center' },
+      React.createElement(
+        'div',
+        { className: 'flex flex-col items-center justify-center min-h-[400px]' },
+        React.createElement(
+          'div',
+          { className: 'animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4' }
+        ),
+        React.createElement('div', { className: 'text-xl text-gray-600' }, 'Loading products...')
+      )
+    );
+  }
+
+  // Error state
+  if (error) {
+    return React.createElement(
+      'div',
+      { className: 'container mx-auto px-4 py-8 text-center' },
+      React.createElement('div', { className: 'text-red-600 text-xl mb-4' }, error),
+      React.createElement(
+        'button',
+        {
+          onClick: () => window.location.reload(),
+          className: 'bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors'
+        },
+        'Retry'
+      )
+    );
+  }
 
   return React.createElement(
     'div',
@@ -283,8 +345,9 @@ const Categories = () => {
                   name: product.name,
                   description: product.description,
                   price: product.price,
-                  image: product.image,
-                  category: product.category
+                  image: product.imageUrl,
+                  category: product.category,
+                  remainingStocks: product.stock
                 })
               )
             )

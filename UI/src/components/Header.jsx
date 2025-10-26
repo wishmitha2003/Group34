@@ -8,15 +8,11 @@ import { useWishlist } from '../context/WishlistContext';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [isIndoorGamesOpen, setIsIndoorGamesOpen] = useState(false);
-  const [isOutdoorGamesOpen, setIsOutdoorGamesOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { totalItems } = useCart();
   const { wishlistCount } = useWishlist();
   const { user, isAuthenticated, logout } = useAuth();
   const userMenuRef = useRef(null);
-  const indoorGamesRef = useRef(null);
-  const outdoorGamesRef = useRef(null);
   const navigate = useNavigate();
 
   // Close dropdowns when clicking outside
@@ -24,12 +20,6 @@ const Header = () => {
     const handleClickOutside = (event) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setIsUserMenuOpen(false);
-      }
-      if (indoorGamesRef.current && !indoorGamesRef.current.contains(event.target)) {
-        setIsIndoorGamesOpen(false);
-      }
-      if (outdoorGamesRef.current && !outdoorGamesRef.current.contains(event.target)) {
-        setIsOutdoorGamesOpen(false);
       }
     };
 
@@ -148,121 +138,7 @@ const Header = () => {
     </div>
   );
 
-  // Indoor Games Dropdown Component
-  const IndoorGamesDropdown = () => (
-    <div 
-      ref={indoorGamesRef}
-      className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-40"
-    >
-      <Link 
-        to="/categories/table-tennis" 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        onClick={() => setIsIndoorGamesOpen(false)}
-      >
-        Table Tennis
-      </Link>
-      <Link 
-        to="/categories/carrom" 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        onClick={() => setIsIndoorGamesOpen(false)}
-      >
-        Carrom
-      </Link>
-      <Link 
-        to="/categories/chess" 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        onClick={() => setIsIndoorGamesOpen(false)}
-      >
-        Chess
-      </Link>
-      <Link 
-        to="/categories/badminton" 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        onClick={() => setIsIndoorGamesOpen(false)}
-      >
-        Badminton
-      </Link>
-      <Link 
-        to="/categories/billiards" 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        onClick={() => setIsIndoorGamesOpen(false)}
-      >
-        Billiards & Pool
-      </Link>
-      <Link 
-        to="/categories/darts" 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        onClick={() => setIsIndoorGamesOpen(false)}
-      >
-        Darts
-      </Link>
-      <Link 
-        to="/categories/board-games" 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        onClick={() => setIsIndoorGamesOpen(false)}
-      >
-        Board Games
-      </Link>
-    </div>
-  );
 
-  // Outdoor Games Dropdown Component
-  const OutdoorGamesDropdown = () => (
-    <div 
-      ref={outdoorGamesRef}
-      className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-40"
-    >
-      <Link 
-        to="/categories/cricket" 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        onClick={() => setIsOutdoorGamesOpen(false)}
-      >
-        Cricket
-      </Link>
-      <Link 
-        to="/categories/football" 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        onClick={() => setIsOutdoorGamesOpen(false)}
-      >
-        Football
-      </Link>
-      <Link 
-        to="/categories/basketball" 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        onClick={() => setIsOutdoorGamesOpen(false)}
-      >
-        Basketball
-      </Link>
-      <Link 
-        to="/categories/tennis" 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        onClick={() => setIsOutdoorGamesOpen(false)}
-      >
-        Tennis
-      </Link>
-      <Link 
-        to="/categories/volleyball" 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        onClick={() => setIsOutdoorGamesOpen(false)}
-      >
-        Volleyball
-      </Link>
-      <Link 
-        to="/categories/baseball" 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        onClick={() => setIsOutdoorGamesOpen(false)}
-      >
-        Baseball
-      </Link>
-      <Link 
-        to="/categories/rugby" 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        onClick={() => setIsOutdoorGamesOpen(false)}
-      >
-        Rugby
-      </Link>
-    </div>
-  );
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -288,41 +164,11 @@ const Header = () => {
               Home
             </Link>
             
-            {/* Indoor Games Dropdown */}
-            <div className="relative">
-              <button 
-                className="font-medium hover:text-blue-600 transition-colors flex items-center space-x-1"
-                onClick={() => setIsIndoorGamesOpen(!isIndoorGamesOpen)}
-              >
-                <span>Indoor Games</span>
-                <ChevronDownIcon className="h-4 w-4" />
-              </button>
-              {isIndoorGamesOpen && <IndoorGamesDropdown />}
-            </div>
-
-            {/* Outdoor Games Dropdown */}
-            <div className="relative">
-              <button 
-                className="font-medium hover:text-blue-600 transition-colors flex items-center space-x-1"
-                onClick={() => setIsOutdoorGamesOpen(!isOutdoorGamesOpen)}
-              >
-                <span>Outdoor Games</span>
-                <ChevronDownIcon className="h-4 w-4" />
-              </button>
-              {isOutdoorGamesOpen && <OutdoorGamesDropdown />}
-            </div>
-
             <Link 
-              to="/categories/gym" 
+              to="/categories" 
               className="font-medium hover:text-blue-600 transition-colors"
             >
-              Gym
-            </Link>
-            <Link 
-              to="/categories/others" 
-              className="font-medium hover:text-blue-600 transition-colors"
-            >
-              Others
+              Category
             </Link>
           </nav>
 
@@ -461,63 +307,12 @@ const Header = () => {
                 Home
               </Link>
               
-              {/* Indoor Games Mobile */}
-              <div className="border-b border-gray-100">
-                <button 
-                  className="font-medium hover:text-blue-600 transition-colors py-2 flex items-center justify-between w-full"
-                  onClick={() => setIsIndoorGamesOpen(!isIndoorGamesOpen)}
-                >
-                  <span>Indoor Games</span>
-                  <ChevronDownIcon className={`h-4 w-4 transform transition-transform ${isIndoorGamesOpen ? 'rotate-180' : ''}`} />
-                </button>
-                {isIndoorGamesOpen && (
-                  <div className="ml-4 mt-2 space-y-2 pb-2">
-                    <Link to="/categories/table-tennis" className="block text-sm py-1 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Table Tennis</Link>
-                    <Link to="/categories/carrom" className="block text-sm py-1 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Carrom</Link>
-                    <Link to="/categories/chess" className="block text-sm py-1 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Chess</Link>
-                    <Link to="/categories/badminton" className="block text-sm py-1 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Badminton</Link>
-                    <Link to="/categories/billiards" className="block text-sm py-1 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Billiards & Pool</Link>
-                    <Link to="/categories/darts" className="block text-sm py-1 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Darts</Link>
-                    <Link to="/categories/board-games" className="block text-sm py-1 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Board Games</Link>
-                  </div>
-                )}
-              </div>
-
-              {/* Outdoor Games Mobile */}
-              <div className="border-b border-gray-100">
-                <button 
-                  className="font-medium hover:text-blue-600 transition-colors py-2 flex items-center justify-between w-full"
-                  onClick={() => setIsOutdoorGamesOpen(!isOutdoorGamesOpen)}
-                >
-                  <span>Outdoor Games</span>
-                  <ChevronDownIcon className={`h-4 w-4 transform transition-transform ${isOutdoorGamesOpen ? 'rotate-180' : ''}`} />
-                </button>
-                {isOutdoorGamesOpen && (
-                  <div className="ml-4 mt-2 space-y-2 pb-2">
-                    <Link to="/categories/cricket" className="block text-sm py-1 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Cricket</Link>
-                    <Link to="/categories/football" className="block text-sm py-1 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Football</Link>
-                    <Link to="/categories/basketball" className="block text-sm py-1 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Basketball</Link>
-                    <Link to="/categories/tennis" className="block text-sm py-1 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Tennis</Link>
-                    <Link to="/categories/volleyball" className="block text-sm py-1 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Volleyball</Link>
-                    <Link to="/categories/baseball" className="block text-sm py-1 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Baseball</Link>
-                    <Link to="/categories/rugby" className="block text-sm py-1 hover:text-blue-600" onClick={() => setIsMenuOpen(false)}>Rugby</Link>
-                  </div>
-                )}
-              </div>
-
               <Link 
-                to="/categories/gym" 
+                to="/categories" 
                 className="font-medium hover:text-blue-600 transition-colors py-2 border-b border-gray-100"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Gym
-              </Link>
-              <Link 
-                to="/categories/others" 
-                className="font-medium hover:text-blue-600 transition-colors py-2 border-b border-gray-100"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Others
+                Category
               </Link>
               
               {/* User Menu Items for Mobile - Only show if authenticated */}
