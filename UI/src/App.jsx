@@ -18,6 +18,7 @@ const Profile = lazy(() => import('./pages/Profile'));
 const OrderHistory = lazy(() => import('./pages/OrderHistory'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
 const Settings = lazy(() => import('./pages/Settings'));
+const ProductView = lazy(() => import('./pages/ProductView')); // Added ProductView
 
 // Loading Spinner Component
 const LoadingSpinner = () => (
@@ -104,10 +105,17 @@ const useRouteTitle = () => {
       '/order-history': 'Order History - GenZsport',
       '/wishlist': 'My Wishlist - GenZsport',
       '/settings': 'Settings - GenZsport',
+      '/products': 'Products - GenZsport',
     };
     
-    const title = routeTitles[location.pathname] || 'GenZsport';
-    document.title = title;
+    // Handle dynamic product pages
+    const productMatch = location.pathname.match(/^\/products\/(\d+)$/);
+    if (productMatch) {
+      document.title = 'Product Details - GenZsport';
+    } else {
+      const title = routeTitles[location.pathname] || 'GenZsport';
+      document.title = title;
+    }
   }, [location.pathname]);
 };
 
@@ -129,6 +137,17 @@ const ProtectedRoute = ({ children }) => {
   }
   
   return user ? children : <Navigate to="/login" replace />;
+};
+
+// Admin Protected Route Component
+const AdminProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+  
+  return user && user.role === 'ADMIN' ? children : <Navigate to="/" replace />;
 };
 
 // Layout Wrapper Component - This ensures hooks are used within providers
@@ -169,6 +188,10 @@ const router = createBrowserRouter([
         element: <Categories /> 
       },
       { 
+        path: 'products/:id', 
+        element: <ProductView /> 
+      },
+      { 
         path: 'cart', 
         element: <Cart /> 
       },
@@ -205,13 +228,13 @@ const router = createBrowserRouter([
         ) 
       },
       {
-  path: 'admin/add-product',
-  element: (
-    <ProtectedRoute>
-      <AddProduct />
-    </ProtectedRoute>
-  )
-},
+        path: 'admin/add-product',
+        element: (
+          <AdminProtectedRoute>
+            <AddProduct />
+          </AdminProtectedRoute>
+        )
+      },
       { 
         path: 'wishlist', 
         element: (
@@ -220,7 +243,6 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ) 
       },
-      
       { 
         path: 'settings', 
         element: (
