@@ -5,12 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4832ca4f-c815-4d78-bf01-40de74a702c4" name="Changes" comment="order process">
-      <change afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/controller/ReviewController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/models/Review.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/repository/ReviewRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/service/ReviewService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/security/SecurityConfig.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
