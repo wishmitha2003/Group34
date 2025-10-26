@@ -28,6 +28,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/profile/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/services/admin/**").hasRole("ADMIN")
                         .requestMatchers("/services/user/**").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/products/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);

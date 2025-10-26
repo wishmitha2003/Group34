@@ -8,6 +8,7 @@ import { WishlistProvider } from './context/WishlistContext';
 
 // Lazy load components for better performance
 const Home = lazy(() => import('./pages/Home'));
+const AddProduct = lazy(() => import('./pages/AddProduct'));
 const Categories = lazy(() => import('./pages/Categories'));
 const Cart = lazy(() => import('./pages/Cart'));
 const Login = lazy(() => import('./pages/Login'));
@@ -203,6 +204,14 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ) 
       },
+      {
+  path: 'admin/add-product',
+  element: (
+    <ProtectedRoute>
+      <AddProduct />
+    </ProtectedRoute>
+  )
+},
       { 
         path: 'wishlist', 
         element: (
@@ -211,6 +220,7 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ) 
       },
+      
       { 
         path: 'settings', 
         element: (
