@@ -1,4 +1,6 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
+import axios from 'axios';
+import api from '../utils/api';
 
 // Fixed mock data for orders with correct totals
 const mockOrders = [
@@ -86,10 +88,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     try {
       const savedUser = localStorage.getItem('user');
+      const authToken = localStorage.getItem('authToken');
       const savedWishlist = localStorage.getItem('wishlist');
       const savedOrders = localStorage.getItem('orders');
 
-      if (savedUser) {
+      // Check if both user data and auth token exist
+      if (savedUser && authToken) {
         try {
           const parsedUser = JSON.parse(savedUser);
           // Validate user object structure
@@ -100,7 +104,11 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
           console.error('Failed to parse user from localStorage', error);
           localStorage.removeItem('user');
+          localStorage.removeItem('authToken');
         }
+      } else if (savedUser && !authToken) {
+        // Clean up old localStorage data if token is missing
+        localStorage.removeItem('user');
       }
 
       if (savedWishlist) {
@@ -179,23 +187,34 @@ export const AuthProvider = ({ children }) => {
         return false;
       }
 
-      const usersString = localStorage.getItem('users');
-      const users = usersString ? JSON.parse(usersString) : [];
-      
-      const foundUser = users.find(u => u.username === username && u.password === password);
-      
-      if (foundUser) {
+      // Call backend API for login
+      const response = await api.post('/api/login', {
+        username: username,
+        password: password
+      });
+
+      if (response.status === 200) {
+        const data = response.data;
+        
+        // Store the JWT token
+        if (data.token) {
+          localStorage.setItem('authToken', data.token);
+        }
+
         // Enhanced user info with additional fields for profile page
         const userInfo = {
-          id: foundUser?.id || String(Date.now()),
-          username: foundUser?.username || '',
-          name: foundUser?.fullName || foundUser?.name || foundUser?.username || 'User',
-          email: foundUser?.email || '',
-          phone: foundUser?.phone || '',
-          address: foundUser?.address || null,
-          profilePicture: foundUser?.profilePicture || null,
-          joinDate: foundUser?.joinDate || '2024',
-          premium: foundUser?.premium || false,
+          id: data.user?.id || String(Date.now()),
+          username: data.user?.username || username,
+          name: data.user?.fullName || data.user?.name || username,
+          email: data.user?.email || '',
+          phone: data.user?.phone || '',
+          address: data.user?.address || null,
+          profilePicture: data.user?.profilePicture || null,
+          joinDate: data.user?.createdAt?.split('T')[0] || '2024',
+          premium: data.user?.serviceType === 'Premium' || false,
+          role: data.user?.role || 'USER',
+          active: data.user?.active || true,
+          available: data.user?.available || true
         };
 
         setUser(userInfo);
@@ -209,9 +228,15 @@ export const AuthProvider = ({ children }) => {
 
         return true;
       }
+      
       return false;
     } catch (error) {
       console.error('Login error', error);
+      
+      if (error.response && error.response.data) {
+        console.error('Login failed:', error.response.data);
+      }
+      
       return false;
     }
   };
@@ -282,6 +307,7 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
     try {
       localStorage.removeItem('user');
+      localStorage.removeItem('authToken');
     } catch (error) {
       console.error('Failed to remove user from localStorage', error);
     }

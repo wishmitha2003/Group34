@@ -274,9 +274,7 @@ const Profile = () => {
                     {user?.name || user?.username || 'User'}
                   </h1>
                   <p className="text-gray-600 mt-1">{user?.email}</p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Member since {user?.joinDate || '2024'}
-                  </p>
+                  
                 </div>
               </div>
               
