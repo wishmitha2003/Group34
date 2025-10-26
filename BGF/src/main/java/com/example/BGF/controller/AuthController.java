@@ -104,6 +104,8 @@ public class AuthController {
                     "username", user.getUsername(),
                     "email", user.getEmail(),
                     "fullName", user.getFullName(),
+                    "phone", user.getPhone() != null ? user.getPhone() : "",
+                    "address", user.getAddress() != null ? user.getAddress() : "",
                     "available", user.isAvailable()
             ));
 

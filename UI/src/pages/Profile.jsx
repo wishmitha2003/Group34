@@ -1,9 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { CameraIcon, UserIcon, XIcon } from 'lucide-react';
 
 const Profile = () => {
-  const { user, updateProfile, updateProfilePicture } = useAuth();
+  const { user, updateProfile, updateProfilePicture, refreshUserProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [isEditingPicture, setIsEditingPicture] = useState(false);
@@ -24,6 +24,29 @@ const Profile = () => {
   const [imagePreview, setImagePreview] = useState(user?.profilePicture || '');
   const fileInputRef = useRef(null);
   const passwordSectionRef = useRef(null);
+
+  // Refresh user profile data when component mounts
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (user) {
+        await refreshUserProfile();
+      }
+    };
+    loadProfile();
+  }, []);
+
+  // Update form data when user changes
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user?.name || user?.fullName || '',
+        email: user?.email || '',
+        phone: user?.phone || '',
+        address: user?.address || '',
+        username: user?.username || ''
+      });
+    }
+  }, [user]);
 
   const handleEditToggle = () => {
     if (isEditing) {
@@ -159,10 +182,14 @@ const Profile = () => {
         return;
       }
 
-      await updateProfile(formData);
-      setMessage('Profile updated successfully!');
-      setIsEditing(false);
-      setTimeout(() => setMessage(''), 3000);
+      const success = await updateProfile(formData);
+      if (success) {
+        setMessage('Profile updated successfully!');
+        setIsEditing(false);
+        setTimeout(() => setMessage(''), 3000);
+      } else {
+        setMessage('Failed to update profile. Please try again.');
+      }
     } catch (error) {
       setMessage('Failed to update profile. Please try again.');
       console.error('Profile update error:', error);
@@ -286,13 +313,6 @@ const Profile = () => {
                   disabled={isLoading}
                 >
                   {isEditing ? 'Cancel Edit' : 'Edit Profile'}
-                </button>
-                <button
-                  onClick={handlePasswordEditToggle}
-                  className="bg-gray-200 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors font-medium"
-                  disabled={isLoading}
-                >
-                  {isEditingPassword ? 'Cancel Password Change' : 'Change Password'}
                 </button>
               </div>
             </div>
@@ -458,100 +478,10 @@ const Profile = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* Additional Information */}
-                <div className="mt-8 pt-6 border-t border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Details</h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="text-center p-4 bg-blue-50 rounded-lg">
-                      <p className="text-2xl font-bold text-blue-600">12</p>
-                      <p className="text-sm text-gray-600">Total Orders</p>
-                    </div>
-                    
-                    <div className="text-center p-4 bg-green-50 rounded-lg">
-                      <p className="text-2xl font-bold text-green-600">8</p>
-                      <p className="text-sm text-gray-600">Wishlist Items</p>
-                    </div>
-                    
-                    <div className="text-center p-4 bg-purple-50 rounded-lg">
-                      <p className="text-2xl font-bold text-purple-600">4</p>
-                      <p className="text-sm text-gray-600">Reviews</p>
-                    </div>
-                  </div>
-                </div>
               </>
             )}
           </div>
         </div>
-
-        {/* Change Password Section */}
-        {isEditingPassword && (
-          <div ref={passwordSectionRef} className="bg-white shadow rounded-lg mt-6">
-            <div className="px-6 py-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-6">Change Password</h2>
-              
-              <form onSubmit={handlePasswordSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-1 gap-6 max-w-2xl">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Current Password *
-                    </label>
-                    <input
-                      type="password"
-                      name="currentPassword"
-                      value={passwordData.currentPassword}
-                      onChange={handlePasswordChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      New Password *
-                    </label>
-                    <input
-                      type="password"
-                      name="newPassword"
-                      value={passwordData.newPassword}
-                      onChange={handlePasswordChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                      minLength="6"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Password must be at least 6 characters long</p>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Confirm New Password *
-                    </label>
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      value={passwordData.confirmPassword}
-                      onChange={handlePasswordChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Save/Cancel Buttons */}
-                <div className="mt-8 flex space-x-4">
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isLoading ? 'Updating...' : 'Update Password'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
 
         {/* Change Profile Picture Modal */}
         {isEditingPicture && (
