@@ -5,12 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4832ca4f-c815-4d78-bf01-40de74a702c4" name="Changes" comment="order process">
-      <change afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/controller/ProductController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/models/Product.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/repository/ProductRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/service/ProductService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BGF/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/BGF/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,7 +91,6 @@
     <attachedChunks>
       <set>
         <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26199.169" />
-        <option value="bundled-js-predefined-d6986cc7102b-9c94529fcfe0-JavaScript-IU-252.26199.169" />
       </set>
     </attachedChunks>
   </component>
@@ -125,6 +119,9 @@
       <workItem from="1761321694341" duration="319000" />
       <workItem from="1761322051507" duration="174000" />
       <workItem from="1761322263269" duration="445000" />
+      <workItem from="1761484717416" duration="165000" />
+      <workItem from="1761485157569" duration="151000" />
+      <workItem from="1761485484726" duration="282000" />
     </task>
     <task id="LOCAL-00001" summary="order process">
       <option name="closed" value="true" />
