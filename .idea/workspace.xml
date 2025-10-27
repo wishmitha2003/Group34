@@ -6,12 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="4832ca4f-c815-4d78-bf01-40de74a702c4" name="Changes" comment="order process">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/controller/ApiController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/controller/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/controller/OrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/models/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/models/Order.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/repository/OrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/repository/OrderRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/security/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/service/OrderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/src/context/AuthContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/UI/src/context/AuthContext.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/src/pages/Checkout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/UI/src/pages/Checkout.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/src/services/productService.js" beforeDir="false" afterPath="$PROJECT_DIR$/UI/src/services/productService.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,7 +128,7 @@
       <workItem from="1761484717416" duration="165000" />
       <workItem from="1761485157569" duration="151000" />
       <workItem from="1761485484726" duration="282000" />
-      <workItem from="1761556015418" duration="4076000" />
+      <workItem from="1761556015418" duration="6927000" />
     </task>
     <task id="LOCAL-00001" summary="order process">
       <option name="closed" value="true" />
