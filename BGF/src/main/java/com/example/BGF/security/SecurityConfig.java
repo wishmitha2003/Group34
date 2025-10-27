@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers("/services/admin/**").hasRole("ADMIN")
                         .requestMatchers("/services/user/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/orders/**").permitAll()
+                        .requestMatchers("/review/user/add").hasRole("USER")
                         .requestMatchers("/review/**").permitAll()
                         .anyRequest().authenticated()
                 )

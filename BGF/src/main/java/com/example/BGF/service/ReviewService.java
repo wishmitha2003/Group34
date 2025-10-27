@@ -13,23 +13,22 @@ public class ReviewService {
     @Autowired
     private ReviewRepository reviewRepository;
 
-    // Create
+    // --- Create ---
     public Review saveReview(Review review) {
         return reviewRepository.save(review);
     }
 
-
-    // Read all
+    // --- Read all ---
     public List<Review> getAllReviews() {
         return reviewRepository.findAll();
     }
 
-    // Read by ID
+    // --- Read by ID ---
     public Review getReviewById(Long id) {
         return reviewRepository.findById(id).orElse(null);
     }
 
-    // Update
+    // --- Update ---
     public Review updateReview(Long id, Review updatedReview) {
         Review review = reviewRepository.findById(id).orElse(null);
         if (review != null) {
@@ -40,7 +39,7 @@ public class ReviewService {
         return null;
     }
 
-    // Delete
+    // --- Delete ---
     public boolean deleteReviewByAdmin(Long id) {
         if (reviewRepository.existsById(id)) {
             reviewRepository.deleteById(id);
@@ -49,23 +48,19 @@ public class ReviewService {
         return false;
     }
 
-
-    // Find reviews by service
-    public List<Review> getReviewsByService(Long serviceId) {
-        return reviewRepository.findByServiceId(serviceId);
+    // --- Find reviews by product ---
+    public List<Review> getReviewsByProduct(Long productId) {
+        return reviewRepository.findByProductId(productId);
     }
 
-    // Find reviews by user
+    // --- Find reviews by user ---
     public List<Review> getReviewsByUser(Long userId) {
         return reviewRepository.findByUserId(userId);
     }
 
-    // Get average rating of a service
-    public double getAverageRating(Long serviceId) {
-        List<Review> reviews = reviewRepository.findByServiceId(serviceId);
+    // --- Get average rating of a product ---
+    public double getAverageRating(Long productId) {
+        List<Review> reviews = reviewRepository.findByProductId(productId);
         return reviews.stream().mapToInt(Review::getRating).average().orElse(0.0);
     }
-
-
-
 }

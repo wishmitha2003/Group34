@@ -24,8 +24,8 @@ public class Review {
     private User user; // Reviewer
 
     @ManyToOne
-    @JoinColumn(name = "service_id", nullable = false)
-    private AppService service; // Reviewed service
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product; // Reviewed product
 
     // --- Constructors ---
     public Review() {
@@ -48,6 +48,6 @@ public class Review {
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 
-    public AppService getService() { return service; }
-    public void setService(AppService service) { this.service = service; }
+    public Product getProduct() { return product; }
+    public void setProduct(Product product) { this.product = product; }
 }
