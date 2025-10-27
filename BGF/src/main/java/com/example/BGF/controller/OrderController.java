@@ -4,6 +4,7 @@ import com.example.BGF.models.Order;
 import com.example.BGF.models.User;
 import com.example.BGF.service.OrderService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -52,8 +53,8 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
-        return ResponseEntity.ok(orderService.getAllOrders());
+    public List<Order> getMyOrders(@AuthenticationPrincipal User user) {
+        return orderService.getOrdersForUser(user);
     }
 
     @PutMapping("/{id}/status")

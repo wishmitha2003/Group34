@@ -62,6 +62,10 @@ public class OrderService {
         return orderRepository.findByUser(user);
     }
 
+
+    public List<Order> getOrdersForUser(User user) {
+        return orderRepository.findByUser(user);
+    }
     public Order updateOrderStatus(Long orderId, String status) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
