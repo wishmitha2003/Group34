@@ -1,20 +1,57 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
-import { products, categories } from '../data/products';
-import { FilterIcon, SearchIcon } from 'lucide-react';
+import productService from '../services/productService';
+import { 
+  SearchIcon, 
+  XIcon,
+  Grid3X3Icon,
+  ListIcon,
+  ChevronDownIcon,
+  SlidersHorizontalIcon,
+  SparklesIcon
+} from 'lucide-react';
 
 const Categories = () => {
   const { category } = useParams();
   const navigate = useNavigate();
+  const [allProducts, setAllProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 300000]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState('featured');
-  const [showFilters, setShowFilters] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [viewMode, setViewMode] = useState('grid');
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
-  const currentCategory = categories.find(cat => cat.slug === category);
+  const currentCategory = categories?.find(cat => cat?.slug === category) || null;
+
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [productsData, categoriesData] = await Promise.all([
+          productService.getAllProducts(),
+          productService.getAllCategories()
+        ]);
+
+        setAllProducts(productsData || []);
+        setCategories(categoriesData || []);
+        setError(null);
+      } catch (err) {
+        setError('Failed to load products. Please try again later.');
+        console.error('Error fetching data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Update selected categories when URL parameter changes
   useEffect(() => {
@@ -25,54 +62,58 @@ const Categories = () => {
     }
   }, [category]);
 
+  // Filter and sort products
   useEffect(() => {
-    let filtered = products;
+    let filtered = allProducts || [];
 
     // Filter by selected categories
     if (selectedCategories.length > 0) {
       filtered = filtered.filter(product => 
-        selectedCategories.includes(product.category)
+        product && selectedCategories.includes(product.category)
       );
     }
 
+    // Filter by search term
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
         product =>
-          product.name.toLowerCase().includes(term) ||
-          product.description.toLowerCase().includes(term)
+          product?.name?.toLowerCase().includes(term) ||
+          product?.description?.toLowerCase().includes(term)
       );
     }
 
+    // Filter by price range
     filtered = filtered.filter(
-      product => product.price >= priceRange[0] && product.price <= priceRange[1]
+      product => product?.price >= priceRange[0] && product?.price <= priceRange[1]
     );
 
+    // Sort products
     switch (sortOption) {
       case 'price-low':
-        filtered = [...filtered].sort((a, b) => a.price - b.price);
+        filtered = [...filtered].sort((a, b) => (a?.price || 0) - (b?.price || 0));
         break;
       case 'price-high':
-        filtered = [...filtered].sort((a, b) => b.price - a.price);
+        filtered = [...filtered].sort((a, b) => (b?.price || 0) - (a?.price || 0));
         break;
       case 'name':
-        filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+        filtered = [...filtered].sort((a, b) => (a?.name || '').localeCompare(b?.name || ''));
+        break;
+      case 'newest':
+        filtered = [...filtered].sort((a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0));
         break;
       default:
-        // 'featured' - no sorting
         break;
     }
 
     setFilteredProducts(filtered);
-  }, [selectedCategories, searchTerm, priceRange, sortOption]);
+  }, [allProducts, selectedCategories, searchTerm, priceRange, sortOption]);
 
   const handleCategoryChange = (categorySlug) => {
     if (selectedCategories.includes(categorySlug)) {
-      // If category is already selected, deselect it and navigate to all products
       setSelectedCategories([]);
       navigate('/categories');
     } else {
-      // Select the category and update URL
       setSelectedCategories([categorySlug]);
       navigate(`/categories/${categorySlug}`);
     }
@@ -86,220 +127,345 @@ const Categories = () => {
     navigate('/categories');
   };
 
-  return React.createElement(
-    'div',
-    { className: 'container mx-auto px-4 py-8' },
-    // Category Header
-    React.createElement(
-      'div',
-      { className: 'mb-8' },
-      React.createElement(
-        'h1',
-        { className: 'text-3xl font-bold mb-2' },
-        currentCategory ? currentCategory.title : 'All Products'
-      ),
-      React.createElement(
-        'p',
-        { className: 'text-gray-600' },
-        currentCategory
-          ? `Explore our range of ${currentCategory.title.toLowerCase()} equipment for all skill levels.`
-          : 'Browse our complete collection of sports equipment.'
-      )
-    ),
-    // Search and Filter Bar
-    React.createElement(
-      'div',
-      { className: 'flex flex-col md:flex-row items-center justify-between mb-6 gap-4' },
-      React.createElement(
-        'div',
-        { className: 'w-full md:w-1/3 relative' },
-        React.createElement('input', {
-          type: 'text',
-          placeholder: 'Search products...',
-          className: 'w-full pl-10 pr-4 py-2 border rounded-md',
-          value: searchTerm,
-          onChange: e => setSearchTerm(e.target.value)
-        }),
-        React.createElement(SearchIcon, { className: 'absolute left-3 top-2.5 h-5 w-5 text-gray-400' })
-      ),
-      React.createElement(
-        'div',
-        { className: 'flex gap-4 w-full md:w-auto' },
-        React.createElement(
-          'button',
-          {
-            className: 'md:hidden flex items-center gap-2 px-4 py-2 border rounded-md bg-white',
-            onClick: () => setShowFilters(!showFilters)
-          },
-          React.createElement(FilterIcon, { className: 'h-4 w-4' }),
-          'Filters'
-        ),
-        React.createElement(
-          'select',
-          {
-            className: 'px-4 py-2 border rounded-md bg-white',
-            value: sortOption,
-            onChange: e => setSortOption(e.target.value)
-          },
-          React.createElement('option', { value: 'featured' }, 'Featured'),
-          React.createElement('option', { value: 'price-low' }, 'Price: Low to High'),
-          React.createElement('option', { value: 'price-high' }, 'Price: High to Low'),
-          React.createElement('option', { value: 'name' }, 'Name: A to Z')
-        )
-      )
-    ),
-    // Main Content: Filters + Products
-    React.createElement(
-      'div',
-      { className: 'flex flex-col md:flex-row gap-8' },
-      // Filters Sidebar
-      React.createElement(
-        'div',
-        {
-          className: `w-full md:w-1/4 lg:w-1/5 md:block ${showFilters ? 'block' : 'hidden'}`
-        },
-        React.createElement(
-          'div',
-          { className: 'bg-white p-4 rounded-lg shadow-md' },
-          React.createElement(
-            'div',
-            { className: 'flex justify-between items-center mb-4' },
-            React.createElement('h3', { className: 'text-lg font-semibold' }, 'Filters'),
-            React.createElement(
-              'button',
-              {
-                onClick: handleClearFilters,
-                className: 'text-sm text-blue-600 hover:text-blue-800'
-              },
-              'Clear all'
-            )
-          ),
-          // ✅ Fixed Price Range - Now in one line
-          React.createElement(
-            'div',
-            { className: 'mb-6' },
-            React.createElement('h4', { className: 'font-medium mb-2' }, 'Price Range'),
-            React.createElement(
-              'div',
-              { className: 'flex items-center justify-between mb-2 text-sm' },
-              React.createElement('span', null, `Rs ${priceRange[0]}`),
-              React.createElement('span', null, `Rs ${priceRange[1]}`)
-            ),
-            // Both range sliders in one line container
-            React.createElement(
-              'div',
-              { className: 'relative' },
-              // Min Range (left slider)
-              React.createElement('input', {
-                type: 'range',
-                min: '0',
-                max: '300000',
-                value: priceRange[0],
-                onChange: e => {
-                  const newMin = parseInt(e.target.value);
-                  if (newMin <= priceRange[1]) {
-                    setPriceRange([newMin, priceRange[1]]);
-                  }
-                },
-                className: 'absolute w-full z-10 appearance-none h-2 bg-transparent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:cursor-pointer'
-              }),
-              // Max Range (right slider)
-              React.createElement('input', {
-                type: 'range',
-                min: '0',
-                max: '300000',
-                value: priceRange[1],
-                onChange: e => {
-                  const newMax = parseInt(e.target.value);
-                  if (newMax >= priceRange[0]) {
-                    setPriceRange([priceRange[0], newMax]);
-                  }
-                },
-                className: 'absolute w-full z-20 appearance-none h-2 bg-transparent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:cursor-pointer'
-              }),
-              // Track background
-              React.createElement(
-                'div',
-                { 
-                  className: 'absolute w-full h-2 bg-gray-200 rounded-full z-0',
-                  style: {
-                    background: `linear-gradient(to right, 
-                      #d1d5db 0%, 
-                      #d1d5db ${(priceRange[0] / 300000) * 100}%, 
-                      #3b82f6 ${(priceRange[0] / 300000) * 100}%, 
-                      #3b82f6 ${(priceRange[1] / 300000) * 100}%, 
-                      #d1d5db ${(priceRange[1] / 300000) * 100}%, 
-                      #d1d5db 100%)`
-                  }
-                }
-              )
-            )
-          ),
-          // ✅ Fixed Categories - Now clickable and updates URL
-          React.createElement(
-            'div',
-            null,
-            React.createElement('h4', { className: 'font-medium mb-2' }, 'Categories'),
-            React.createElement(
-              'ul',
-              { className: 'space-y-2' },
-              ...categories.map(cat =>
-                React.createElement(
-                  'li',
-                  { key: cat.id, className: 'flex items-center' },
-                  React.createElement('input', {
-                    type: 'checkbox',
-                    id: cat.slug,
-                    checked: selectedCategories.includes(cat.slug),
-                    onChange: () => handleCategoryChange(cat.slug),
-                    className: 'mr-2 cursor-pointer'
-                  }),
-                  React.createElement(
-                    'label', 
-                    { 
-                      htmlFor: cat.slug,
-                      className: 'cursor-pointer hover:text-blue-600'
-                    }, 
-                    cat.title
-                  )
-                )
-              )
-            )
-          )
-        )
-      ),
-      // Products Grid
-      React.createElement(
-        'div',
-        { className: 'flex-1' },
-        filteredProducts.length > 0
-          ? React.createElement(
-              'div',
-              { className: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6' },
-              ...filteredProducts.map(product =>
-                React.createElement(ProductCard, {
-                  key: product.id,
-                  id: product.id,
-                  name: product.name,
-                  description: product.description,
-                  price: product.price,
-                  image: product.image,
-                  category: product.category
-                })
-              )
-            )
-          : React.createElement(
-              'div',
-              { className: 'text-center py-12' },
-              React.createElement('h3', { className: 'text-xl font-medium mb-2' }, 'No products found'),
-              React.createElement(
-                'p',
-                { className: 'text-gray-600' },
-                'Try adjusting your search or filter criteria'
-              )
-            )
-      )
-    )
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
+  const getCategoryDescription = () => {
+    if (!currentCategory || !currentCategory.title) {
+      return 'Discover premium sports equipment designed for athletes of all levels. Professional gear for exceptional performance.';
+    }
+    return `Premium ${currentCategory.title.toLowerCase()} collection - professional gear designed for serious athletes and peak performance.`;
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 py-8">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center justify-center min-h-[70vh]">
+            <div className="relative">
+              <div className="animate-spin rounded-full h-20 w-20 border-4 border-blue-600 border-t-transparent mb-6"></div>
+              <SparklesIcon className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-8 text-blue-600" />
+            </div>
+            <div className="text-2xl font-bold text-gray-800 mb-2">Curating Your Collection</div>
+            <div className="text-gray-600 text-lg">Finding the best products for you...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 py-8">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
+            <div className="w-32 h-32 bg-red-100 rounded-full flex items-center justify-center mb-8 shadow-lg">
+              <XIcon className="h-16 w-16 text-red-600" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Unable to Load Products</h2>
+            <p className="text-gray-600 text-lg mb-8 max-w-md">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-10 py-4 rounded-2xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:-translate-y-1"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
+      {/* Enhanced Header Section */}
+      <div className="bg-white/80 backdrop-blur-lg shadow-sm border-b border-gray-200/60">
+        <div className="container mx-auto px-4 py-12">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <SparklesIcon className="h-4 w-4" />
+              Premium Sports Collection
+            </div>
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-gray-900 to-blue-900 bg-clip-text text-transparent">
+              {currentCategory?.title || 'All Products'}
+            </h1>
+            <p className="text-xl text-gray-600 leading-relaxed">
+              {getCategoryDescription()}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Enhanced Controls Bar */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl border border-gray-200/60 p-6 mb-8">
+          <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
+            {/* Search Bar */}
+            <div className="flex-1 w-full max-w-2xl">
+              <div className="relative">
+                <SearchIcon className="absolute left-5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search products by name, description, or features..."
+                  className="w-full pl-14 pr-6 py-4 bg-white border border-gray-300/80 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 shadow-sm text-lg"
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Controls Group */}
+            <div className="flex items-center gap-4 w-full lg:w-auto">
+              {/* View Mode Toggle */}
+              <div className="flex bg-gray-100 rounded-2xl p-1.5">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-3 rounded-xl transition-all duration-300 ${
+                    viewMode === 'grid' 
+                      ? 'bg-white text-blue-600 shadow-lg' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <Grid3X3Icon className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-3 rounded-xl transition-all duration-300 ${
+                    viewMode === 'list' 
+                      ? 'bg-white text-blue-600 shadow-lg' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <ListIcon className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Sort Dropdown */}
+              <div className="relative flex-1 lg:flex-none">
+                <select
+                  className="w-full appearance-none bg-white border border-gray-300/80 rounded-2xl pl-5 pr-12 py-4 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 shadow-sm text-lg font-medium cursor-pointer"
+                  value={sortOption}
+                  onChange={e => setSortOption(e.target.value)}
+                >
+                  <option value="featured">Featured</option>
+                  <option value="newest">Newest First</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="name">Name: A to Z</option>
+                </select>
+                <ChevronDownIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+              </div>
+
+              {/* Mobile Filter Button */}
+              <button
+                className="lg:hidden flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-semibold"
+                onClick={() => setMobileFilterOpen(true)}
+              >
+                <SlidersHorizontalIcon className="h-5 w-5" />
+                Filters
+              </button>
+            </div>
+          </div>
+
+          {/* Active Filters & Results */}
+          <div className="flex flex-col sm:flex-row items-center justify-between mt-6 pt-6 border-t border-gray-200/60">
+            <div className="flex items-center gap-4 mb-4 sm:mb-0">
+              <span className="text-lg font-semibold text-gray-900">
+                {filteredProducts.length} {filteredProducts.length === 1 ? 'Product' : 'Products'}
+              </span>
+              {(selectedCategories.length > 0 || searchTerm || priceRange[0] > 0 || priceRange[1] < 300000) && (
+                <button
+                  onClick={handleClearFilters}
+                  className="text-blue-600 hover:text-blue-800 font-semibold text-lg transition-colors duration-200 flex items-center gap-2"
+                >
+                  Clear Filters
+                  <XIcon className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            
+            {/* Quick Category Filters */}
+            <div className="flex flex-wrap gap-3">
+              {categories?.slice(0, 4).map(cat => (
+                <button
+                  key={cat?.id}
+                  onClick={() => handleCategoryChange(cat?.slug)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                    selectedCategories.includes(cat?.slug)
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'bg-white text-gray-700 border border-gray-300/80 hover:border-blue-500 hover:text-blue-600'
+                  }`}
+                >
+                  {cat?.title}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        <div className="flex-1">
+          {filteredProducts.length > 0 ? (
+            <div className={`
+              ${viewMode === 'grid' 
+                ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8' 
+                : 'space-y-6'
+              }
+            `}>
+              {filteredProducts.map(product => (
+                <ProductCard
+                  key={product?.id}
+                  id={product?.id}
+                  name={product?.name}
+                  description={product?.description}
+                  price={product?.price}
+                  image={product?.imageUrl}
+                  category={product?.category}
+                  remainingStocks={product?.stock}
+                  viewMode={viewMode}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20 bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl border border-gray-200/60">
+              <div className="w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
+                <SearchIcon className="h-16 w-16 text-blue-600" />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">No Products Found</h3>
+              <p className="text-gray-600 text-lg max-w-md mx-auto mb-8 leading-relaxed">
+                We couldn't find any products matching your criteria. Try adjusting your search terms or filters.
+              </p>
+              <button
+                onClick={handleClearFilters}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-12 py-4 rounded-2xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:-translate-y-1"
+              >
+                Show All Products
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Enhanced Mobile Filter Overlay */}
+      {mobileFilterOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+            onClick={() => setMobileFilterOpen(false)}
+          />
+          <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl transform transition-transform duration-300">
+            <div className="flex flex-col h-full">
+              {/* Header */}
+              <div className="flex justify-between items-center p-6 border-b border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900">Filters</h3>
+                <button
+                  onClick={() => setMobileFilterOpen(false)}
+                  className="p-3 hover:bg-gray-100 rounded-2xl transition-colors duration-200"
+                >
+                  <XIcon className="h-6 w-6" />
+                </button>
+              </div>
+
+              {/* Filter Content */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                {/* Price Range */}
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-6">Price Range</h4>
+                  <div className="space-y-6">
+                    <div className="relative pt-8">
+                      <div className="relative h-3 bg-gray-200 rounded-full">
+                        <div
+                          className="absolute h-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"
+                          style={{
+                            left: `${(priceRange[0] / 300000) * 100}%`,
+                            right: `${100 - (priceRange[1] / 300000) * 100}%`
+                          }}
+                        />
+                        <input
+                          type="range"
+                          min="0"
+                          max="300000"
+                          value={priceRange[0]}
+                          onChange={e => {
+                            const newMin = parseInt(e.target.value);
+                            if (newMin <= priceRange[1]) {
+                              setPriceRange([newMin, priceRange[1]]);
+                            }
+                          }}
+                          className="absolute w-full top-0 h-3 bg-transparent appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-blue-600 [&::-webkit-slider-thumb]:shadow-2xl [&::-webkit-slider-thumb]:cursor-pointer"
+                        />
+                        <input
+                          type="range"
+                          min="0"
+                          max="300000"
+                          value={priceRange[1]}
+                          onChange={e => {
+                            const newMax = parseInt(e.target.value);
+                            if (newMax >= priceRange[0]) {
+                              setPriceRange([priceRange[0], newMax]);
+                            }
+                          }}
+                          className="absolute w-full top-0 h-3 bg-transparent appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-purple-600 [&::-webkit-slider-thumb]:shadow-2xl [&::-webkit-slider-thumb]:cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex items-center justify-between text-lg font-semibold text-gray-900 mt-6">
+                        <span>{formatPrice(priceRange[0])}</span>
+                        <span>{formatPrice(priceRange[1])}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Categories */}
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-6">Categories</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    {categories?.map(cat => (
+                      <button
+                        key={cat?.id}
+                        onClick={() => handleCategoryChange(cat?.slug)}
+                        className={`p-4 rounded-2xl border-2 transition-all duration-300 text-left ${
+                          selectedCategories.includes(cat?.slug)
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-lg'
+                            : 'bg-white border-gray-300 text-gray-700 hover:border-blue-500 hover:shadow-md'
+                        }`}
+                      >
+                        <div className="font-semibold">{cat?.title}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="border-t border-gray-200 p-6 bg-white">
+                <div className="flex gap-4">
+                  <button
+                    onClick={handleClearFilters}
+                    className="flex-1 px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-2xl font-semibold hover:border-gray-400 transition-all duration-300"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    onClick={() => setMobileFilterOpen(false)}
+                    className="flex-1 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

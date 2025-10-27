@@ -1,4 +1,3 @@
-
 package com.example.BGF.models;
 
 import jakarta.persistence.*;
@@ -20,6 +19,8 @@ public class Product {
     private Integer stock;
 
     private String category;
+
+    private String imageUrl; // <-- Added image URL field
 
     // Relationship with User (optional, admin who added)
     @ManyToOne
@@ -44,6 +45,9 @@ public class Product {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    public String getImageUrl() { return imageUrl; } // Getter for imageUrl
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; } // Setter for imageUrl
 
     public User getAdmin() { return admin; }
     public void setAdmin(User admin) { this.admin = admin; }

@@ -1,0 +1,21 @@
+-- Insert sample products for testing
+INSERT INTO products (name, description, price, stock, category, image_url) VALUES
+('Pro Cricket Bat', 'Professional grade cricket bat made from premium English willow. Perfect balance and excellent pickup.', 55000.00, 10, 'cricket', 'https://b3cricket.com/cdn/shop/files/Maverick24pro.png?v=1737558581&width=1080'),
+('Cricket Batting Gloves', 'High-quality batting gloves with superior protection and comfort. Designed for professional players.', 7000.00, 25, 'cricket', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS74ETFHD3YUSg5ByVEsZDrNx6-m3K3mvVqw63mzp6tLy9kysXP9hVydMF8g1Vn6iWLSls&usqp=CAU'),
+('Cricket Helmet', 'Premium cricket helmet with advanced protection features. Lightweight and comfortable for long matches.', 8000.00, 15, 'cricket', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpVGNvN6DUrG79p5oyt1sPVoWvaamDsAPSYQ&s'),
+('Cricket Ball Set', 'Set of 6 professional cricket balls. Durable leather construction with perfect seam and weight.', 10000.00, 30, 'cricket', 'https://m.media-amazon.com/images/I/61eXWnxtZjL._UF894,1000_QL80_.jpg'),
+
+('Professional Football', 'Official size and weight professional football. Hand-stitched for durability and consistent performance.', 3200.00, 20, 'football', 'https://i0.wp.com/catchme.lk/wp-content/uploads/powerstrike-football-16972007090427.webp'),
+('Football Cleats', 'High-performance football cleats with superior grip and comfort. Designed for speed and agility.', 25800.00, 12, 'football', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTd6ECy4NfLRnfdC3H91Rfv_vTpWThYc6A9rrZxfGjdyf-GNYW76ZA4aDdb__vpS-OYgrQ&usqp=CAU'),
+('Goalkeeper Gloves', 'Professional goalkeeper gloves with excellent grip and finger protection. Comfortable fit for extended use.', 2900.00, 18, 'football', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHK4bMgpyVEcji-uXEgCaxX_r6RXXzHIJ4iw&s'),
+('Football Training Cones', 'Set of 50 training cones for football practice. Durable plastic construction in bright colors.', 5800.00, 35, 'football', 'https://nwscdn.com/media/catalog/product/cache/h900xw900/f/l/flexible-training-cones-main-new-logo.jpg'),
+
+('Table Tennis Set', 'Complete table tennis set with 2 premium paddles, 6 balls, and portable net. Perfect for home or office.', 3000.00, 22, 'indoor-games', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmGbR5VcJCMVMu8c8UJs3c1k79DD8coGKGvQ&s'),
+('Chess Set', 'Premium wooden chess set with hand-carved pieces. Foldable board for easy storage and transport.', 7250.00, 8, 'indoor-games', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvp6e1_Q10nLMZQ43QVwWyqGXz09AqvhDnaT0awAnASlb7uBR-zD2FkQT2iS5YHRI2Lb4&usqp=CAU'),
+('Carrom Board', 'Professional grade carrom board with smooth playing surface. Includes striker and coins.', 6200.00, 14, 'indoor-games', 'https://sportsgoodsmarket.com/wp-content/uploads/2020/08/KIDS-CHOICE-Carrom-1-scaled-e1597165535391.jpg'),
+('Dart Board Set', 'Professional dart board with 6 steel-tipped darts. Includes mounting hardware and instructions.', 2100.00, 28, 'indoor-games', 'https://i.ebayimg.com/images/g/xFUAAOSwJeNj72Hh/s-l1200.jpg'),
+
+('Adjustable Dumbbells', 'Space-saving adjustable dumbbells with weight range from 5-52.5 lbs. Easy weight selection mechanism.', 8800.00, 6, 'gym', 'https://dynamofitness.com.au/cdn/shop/products/4-21kg-adjustable-dumbbell-set_1.jpg?v=1671664241'),
+('Yoga Mat', 'Eco-friendly yoga mat with excellent grip and cushioning. Non-slip surface for safety during workouts.', 2200.00, 40, 'gym', 'https://sppartos.com/cdn/shop/files/31VX-aIlgWL_580x.jpg?v=1702469142'),
+('Resistance Bands Set', 'Complete set of 5 resistance bands with different resistance levels. Includes handles, ankle straps, and door anchor.', 5800.00, 16, 'gym', 'https://cdn-ildohgi.nitrocdn.com/uXnSxNSxNnHtVEbpsgZmgmykjDTyCTUY/assets/images/optimized/rev-0e514cd/fitnessequipmentireland.ie/wp-content/uploads/2019/10/WhatsApp-Image-2020-06-27-at-13.01.05-510x603-1.jpeg'),
+('Kettlebell', 'Cast iron kettlebell with vinyl coating for floor protection. Perfect for strength and cardio workouts.', 1900.00, 24, 'gym', 'https://americanbarbell.com/cdn/shop/files/KB-1v2.jpg?v=1698731284');

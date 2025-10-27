@@ -37,7 +37,7 @@ import { useAuth } from '../context/AuthContext';
  */
 
 const Checkout = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, token } = useAuth();
   const { cart, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
@@ -60,6 +60,7 @@ const Checkout = () => {
   const [orderId, setOrderId] = useState('');
   const [orderDetails, setOrderDetails] = useState(null);
   const [transportOption, setTransportOption] = useState(null);
+  const [apiError, setApiError] = useState('');
 
   // Calculate transport fee
   const transportFee = transportOption === 'in_southern' ? 500 : transportOption === 'out_southern' ? 800 : 0;
@@ -130,6 +131,7 @@ const Checkout = () => {
     setTransportOption(null);
     // Clear any existing errors
     setErrors({});
+    setApiError('');
   };
 
   const handleTransportOption = (option) => {
@@ -177,7 +179,50 @@ const Checkout = () => {
     return `GZ-${timestamp.slice(-6)}-${randomNum}`;
   };
 
-  const handleCompleteOrder = () => {
+  // Convert frontend payment method to backend format
+  const getBackendPaymentMethod = (method) => {
+    switch (method) {
+      case 'card': return 'CARD';
+      case 'bank_slip': return 'BANK_SLIP';
+      case 'cash_on_delivery': return 'CASH_ON_DELIVERY';
+      default: return 'CARD';
+    }
+  };
+
+  // Convert frontend status to backend format
+  const getBackendStatus = (method) => {
+    switch (method) {
+      case 'bank_slip': return 'PENDING';
+      case 'cash_on_delivery': return 'CONFIRMED';
+      default: return 'PENDING';
+    }
+  };
+
+  // API call to create order
+  const createOrderInBackend = async (orderData) => {
+    try {
+      const response = await fetch('http://localhost:8082/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create order');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error creating order:', error);
+      throw error;
+    }
+  };
+
+  const handleCompleteOrder = async () => {
     if (!paymentMethod) {
       setErrors({ payment: 'Please select a payment method' });
       return;
@@ -204,29 +249,53 @@ const Checkout = () => {
     }
 
     setIsProcessing(true);
-    const newOrderId = generateOrderId();
-    setOrderId(newOrderId);
+    setApiError('');
 
-    const newOrderDetails = {
-      id: newOrderId,
-      date: new Date().toISOString(),
-      status: paymentMethod === 'bank_slip' ? 'awaiting_approval' : 'completed',
-      items: cart,
-      totalPrice: totalPrice,
-      transportFee: transportFee,
-      finalTotal: finalTotal,
-      shippingInfo: {
-        fullName: formData.fullName,
-        address: formData.address,
-        phoneNumber: formData.phoneNumber
-      },
-      paymentMethod: paymentMethod,
-      transportOption: transportOption,
-      slipImage: slipPreview || undefined
-    };
+    try {
+      // Create orders for each product in cart
+      const orderPromises = cart.map(async (item) => {
+        const orderPayload = {
+          userId: user.id, // Assuming user object has id
+          productId: item.id, // Assuming cart item has product id
+          quantity: item.quantity,
+          price: item.price, // price per item
+          totalAmount: item.price * item.quantity, // total for this item
+          shippingAddress: formData.address,
+          paymentMethod: getBackendPaymentMethod(paymentMethod),
+          notes: `Customer: ${formData.fullName}, Phone: ${formData.phoneNumber}. ${paymentMethod === 'cash_on_delivery' ? `Transport: ${transportOption}` : ''}`,
+          status: getBackendStatus(paymentMethod)
+        };
 
-    // Simulate processing time
-    setTimeout(() => {
+        return await createOrderInBackend(orderPayload);
+      });
+
+      // Wait for all orders to be created
+      const backendOrders = await Promise.all(orderPromises);
+      
+      // Generate frontend order ID for display
+      const newOrderId = generateOrderId();
+      setOrderId(newOrderId);
+
+      // Create frontend order details
+      const newOrderDetails = {
+        id: newOrderId,
+        backendOrderIds: backendOrders.map(order => order.id), // Store backend order IDs
+        date: new Date().toISOString(),
+        status: paymentMethod === 'bank_slip' ? 'awaiting_approval' : 'completed',
+        items: cart,
+        totalPrice: totalPrice,
+        transportFee: transportFee,
+        finalTotal: finalTotal,
+        shippingInfo: {
+          fullName: formData.fullName,
+          address: formData.address,
+          phoneNumber: formData.phoneNumber
+        },
+        paymentMethod: paymentMethod,
+        transportOption: transportOption,
+        slipImage: slipPreview || undefined
+      };
+
       setIsProcessing(false);
       setOrderComplete(true);
       setOrderStatus(paymentMethod === 'bank_slip' ? 'awaiting_approval' : 'completed');
@@ -252,7 +321,12 @@ const Checkout = () => {
           setOrderDetails(prev => prev ? { ...prev, status: 'approved' } : null);
         }, 10000);
       }
-    }, 2000);
+
+    } catch (error) {
+      console.error('Order creation failed:', error);
+      setIsProcessing(false);
+      setApiError(error.message || 'Failed to create order. Please try again.');
+    }
   };
 
   const generateInvoice = () => {
@@ -526,6 +600,16 @@ const Checkout = () => {
             <p className="text-sm text-blue-700">
               Your profile information has been automatically filled in. You can edit these details if needed.
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* API Error Display */}
+      {apiError && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+          <div className="flex items-center">
+            <AlertCircleIcon className="h-5 w-5 text-red-500 mr-2" />
+            <p className="text-sm text-red-700">{apiError}</p>
           </div>
         </div>
       )}

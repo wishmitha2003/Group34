@@ -188,7 +188,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Call backend API for login
-      const response = await api.post('/api/login', {
+      const response = await api.post('/auth/login', {
         username: username,
         password: password
       });
@@ -314,20 +314,107 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateProfile = async (userData) => {
-    if (!user) return;
+    if (!user) return false;
     
-    const updatedUser = { 
-      ...user, 
-      ...userData,
-      // Ensure name field is properly set (some components expect 'name' instead of 'fullName')
-      name: userData?.name || userData?.fullName || user?.name || user?.fullName || 'User'
-    };
-    
-    setUser(updatedUser);
     try {
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      // Debug: Check if token exists
+      const token = localStorage.getItem('authToken');
+      console.log('Update Profile - JWT Token exists:', !!token);
+      console.log('Update Profile - User ID:', user.id);
+      console.log('Update Profile - Data:', userData);
+      
+      // Call backend API to update profile
+      const response = await api.put(`/auth/profile/${user.id}`, {
+        fullName: userData.name || userData.fullName,
+        email: userData.email,
+        phone: userData.phone,
+        address: userData.address,
+        username: userData.username
+      });
+
+      if (response.status === 200) {
+        // Update local user state with response data
+        const updatedUser = {
+          ...user,
+          ...userData,
+          name: userData?.name || userData?.fullName || user?.name || user?.fullName || 'User',
+          // Update with backend response data
+          fullName: response.data.user?.fullName || userData.name || userData.fullName,
+          email: response.data.user?.email || userData.email,
+          phone: response.data.user?.phone || userData.phone,
+          address: response.data.user?.address || userData.address
+        };
+        
+        setUser(updatedUser);
+        
+        try {
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+        } catch (error) {
+          console.error('Failed to update user in localStorage', error);
+        }
+        
+        return true;
+      }
+      
+      return false;
     } catch (error) {
-      console.error('Failed to update user in localStorage', error);
+      console.error('Failed to update profile:', error);
+      console.error('Update Profile Error details:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        headers: error.response?.headers
+      });
+      return false;
+    }
+  };
+
+  const refreshUserProfile = async () => {
+    if (!user) return false;
+    
+    try {
+      // Debug: Check if token exists
+      const token = localStorage.getItem('authToken');
+      console.log('JWT Token exists:', !!token);
+      console.log('User ID:', user.id);
+      
+      // Call backend API to get latest profile data
+      const response = await api.get(`/auth/profile/${user.id}`);
+      
+      if (response.status === 200) {
+        const userData = response.data;
+        const updatedUser = {
+          ...user,
+          name: userData.fullName || userData.name || user.name,
+          fullName: userData.fullName,
+          email: userData.email,
+          phone: userData.phone,
+          address: userData.address,
+          username: userData.username,
+          role: userData.role,
+          active: userData.active,
+          available: userData.available
+        };
+        
+        setUser(updatedUser);
+        
+        try {
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+        } catch (error) {
+          console.error('Failed to update user in localStorage', error);
+        }
+        
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Failed to refresh user profile:', error);
+      console.error('Error details:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        headers: error.response?.headers
+      });
+      return false;
     }
   };
 
@@ -443,6 +530,7 @@ export const AuthProvider = ({ children }) => {
         signup,
         logout,
         updateProfile,
+        refreshUserProfile,
         updateProfilePicture,
         addToWishlist,
         removeFromWishlist,

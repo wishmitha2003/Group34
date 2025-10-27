@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { PlusIcon, MinusIcon, ShoppingCartIcon, HeartIcon } from 'lucide-react';
+import { FileText, HeartIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { useWishlist } from '../context/WishlistContext'; // Import the wishlist context
+import { useWishlist } from '../context/WishlistContext';
 
 const ProductCard = ({
   id,
@@ -9,11 +10,16 @@ const ProductCard = ({
   description,
   price,
   image,
-  category
+  category,
+  weight,
+  middlePosition,
+  concave,
+  remainingStocks
 }) => {
   const [quantity, setQuantity] = useState(1);
+  const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist(); // Use wishlist context
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   const increaseQuantity = () => {
     setQuantity(prev => prev + 1);
@@ -23,6 +29,10 @@ const ProductCard = ({
     if (quantity > 1) {
       setQuantity(prev => prev - 1);
     }
+  };
+
+  const handleViewDetails = () => {
+    navigate(`/product/${id}`);
   };
 
   const handleAddToCart = () => {
@@ -55,7 +65,6 @@ const ProductCard = ({
       addToWishlist({ id, name, price, image, category });
     }
 
-    // Show wishlist notification
     const wishlistNotification = document.getElementById(`wishlist-notification-${id}`);
     if (wishlistNotification) {
       const action = isInWishlist(id) ? 'Removed from' : 'Added to';
@@ -74,7 +83,7 @@ const ProductCard = ({
     'div',
     { className: 'bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105 relative' },
     
-    // Wishlist button - positioned at top left
+    // Wishlist button
     React.createElement(
       'button',
       {
@@ -105,61 +114,90 @@ const ProductCard = ({
     React.createElement(
       'div',
       { className: 'p-4' },
-      // Category badge
+      // Category name
       React.createElement(
         'span',
         { className: 'text-xs font-semibold text-blue-600 uppercase tracking-wider' },
         category
       ),
+      
       // Product name
       React.createElement('h3', { className: 'text-lg font-semibold mt-1' }, name),
+      
+      // Remaining Stocks
+      React.createElement(
+        'div',
+        { className: 'mt-1 mb-2' },
+        React.createElement(
+          'span',
+          { 
+            className: `text-sm font-medium ${
+              (remainingStocks || 0) > 10 
+                ? 'text-green-600' 
+                : (remainingStocks || 0) > 0 
+                ? 'text-orange-600' 
+                : 'text-red-600'
+            }` 
+          },
+          (remainingStocks || 0) > 0 
+            ? `Remaining ${remainingStocks || 0} Stocks` 
+            : 'Out of Stock'
+        )
+      ),
+      
+      // Product specifications
+      React.createElement(
+        'div',
+        { className: 'space-y-1 text-sm text-gray-600 mb-3' },
+        weight && React.createElement(
+          'div',
+          { className: 'flex justify-between' },
+          React.createElement('span', { className: 'font-medium' }, 'WEIGHT'),
+          React.createElement('span', null, weight)
+        ),
+        middlePosition && React.createElement(
+          'div',
+          { className: 'flex justify-between' },
+          React.createElement('span', { className: 'font-medium' }, 'MIDDLE POSITION'),
+          React.createElement('span', null, middlePosition)
+        ),
+        concave && React.createElement(
+          'div',
+          { className: 'flex justify-between' },
+          React.createElement('span', { className: 'font-medium' }, 'CONCAVE'),
+          React.createElement('span', null, concave)
+        )
+      ),
+      
       // Description
       React.createElement(
         'p',
         { className: 'text-gray-600 text-sm mt-2 line-clamp-2' },
         description
       ),
-      // Price and quantity controls
+      
+      // Price - Centered
       React.createElement(
         'div',
-        { className: 'mt-4 flex items-center justify-between' },
+        { className: 'mt-4 flex justify-center' },
         React.createElement(
           'span',
-          { className: 'text-xl font-bold text-gray-900' },
-          `Rs ${price.toFixed(2)}`
-        ),
-        React.createElement(
-          'div',
-          { className: 'flex items-center space-x-2' },
-          React.createElement(
-            'button',
-            {
-              onClick: decreaseQuantity,
-              className: 'p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors',
-              disabled: quantity <= 1
-            },
-            React.createElement(MinusIcon, { className: 'h-4 w-4' })
-          ),
-          React.createElement('span', { className: 'w-6 text-center' }, quantity),
-          React.createElement(
-            'button',
-            {
-              onClick: increaseQuantity,
-              className: 'p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors'
-            },
-            React.createElement(PlusIcon, { className: 'h-4 w-4' })
-          )
+          { className: 'text-xl font-bold text-gray-900 text-center' },
+          `Rs ${price ? price.toFixed(2) : '0.00'}`
         )
       ),
-      // Add to Cart button
+      
+
+      
+      // View Details button
       React.createElement(
         'button',
         {
-          onClick: handleAddToCart,
-          className: 'mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center'
+          onClick: handleViewDetails,
+          className: 'mt-4 w-full py-2 rounded-md transition-colors flex items-center justify-center bg-blue-600 text-white hover:bg-blue-700'
         },
-        React.createElement(ShoppingCartIcon, { className: 'h-4 w-4 mr-2' }),
-        'Add to Cart'
+        React.createElement(FileText, { className: 'h-4 w-4 mr-2' }),
+        'View Details'
       )
     ),
     
