@@ -1,10 +1,8 @@
 import axios from 'axios';
-
 // Create an Axios instance with base URL
 const api = axios.create({
   baseURL: 'http://localhost:8082', // base URL for all requests
 });
-
 // Axios interceptor to automatically attach JWT token
 api.interceptors.request.use(
   (config) => {
@@ -16,9 +14,8 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
 export const productService = {
-  // 🔹 Add a new product (admin only)
+  // :small_blue_diamond: Add a new product (admin only)
   addProduct: async (productData) => {
     try {
       const response = await api.post('/products/admin/add', productData);
@@ -28,30 +25,27 @@ export const productService = {
       throw error;
     }
   },
-
-  // 🔹 Get all products
+  // :small_blue_diamond: Get all products
   getAllProducts: async () => {
     try {
-      const response = await api.get('/api/products');
+      const response = await api.get('/products/all');
       return response.data;
     } catch (error) {
       console.error('Error fetching products:', error);
       throw error;
     }
   },
-
-  // 🔹 Get product by ID
+  // :small_blue_diamond: Get product by ID
   getProductById: async (id) => {
     try {
-      const response = await api.get(`/api/products/${id}`);
+      const response = await api.get(`/products/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching product:', error);
       throw error;
     }
   },
-
-  // 🔹 Update a product (admin only)
+  // :small_blue_diamond: Update a product (admin only)
   updateProduct: async (id, productData) => {
     try {
       const response = await api.put(`/products/admin/update/${id}`, productData);
@@ -61,8 +55,7 @@ export const productService = {
       throw error;
     }
   },
-
-  // 🔹 Delete a product (admin only)
+  // :small_blue_diamond: Delete a product (admin only)
   deleteProduct: async (id) => {
     try {
       const response = await api.delete(`/products/admin/delete/${id}`);
@@ -72,8 +65,7 @@ export const productService = {
       throw error;
     }
   },
-
-  // 🔹 Search products by name
+  // :small_blue_diamond: Search products by name
   searchProducts: async (name) => {
     try {
       const response = await api.get(`/api/products/search?query=${encodeURIComponent(name)}`);
@@ -83,8 +75,7 @@ export const productService = {
       throw error;
     }
   },
-
-  // 🔹 Filter products by category
+  // :small_blue_diamond: Filter products by category
   filterByCategory: async (category) => {
     try {
       const response = await api.get(`/api/products/category/${encodeURIComponent(category)}`);
@@ -94,19 +85,17 @@ export const productService = {
       throw error;
     }
   },
-
-  // 🔹 Get all categories
+  // :small_blue_diamond: Get all categories
   getAllCategories: async () => {
     try {
-      const response = await api.get('/api/categories');
+      const response = await api.get('/products/all');
       return response.data;
     } catch (error) {
       console.error('Error fetching categories:', error);
       throw error;
     }
   },
-
-  // 🔹 Get products by category
+  // :small_blue_diamond: Get products by category
   getProductsByCategory: async (category) => {
     try {
       const response = await api.get(`/api/products/category/${encodeURIComponent(category)}`);
@@ -117,5 +106,4 @@ export const productService = {
     }
   },
 };
-
 export default productService;

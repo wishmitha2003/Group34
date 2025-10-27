@@ -22,16 +22,16 @@ const ProductView = () => {
     comment: ''
   });
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8082/api/products`);
-        // Find the product with matching ID from the list
-        const foundProduct = response.data.find(p => p.id.toString() === id);
-        if (foundProduct) {
-          setProduct(foundProduct);
+        const response = await axios.get(`http://localhost:8082/products/${id}`);
+        
+        if (response.data) {
+          setProduct(response.data);
           setError(null);
         } else {
           setError('Product not found');
@@ -49,11 +49,17 @@ const ProductView = () => {
 
     const fetchReviews = async () => {
       try {
-        // This would be your actual reviews API endpoint
-        // const response = await axios.get(`http://localhost:8082/products/${id}/reviews`);
-        // setReviews(response.data);
+        setReviewsLoading(true);
+        const response = await axios.get(`http://localhost:8082/review`);
         
-        // Mock reviews for demonstration
+        // Filter reviews for this specific product
+        const productReviews = response.data.filter(review => 
+          review.product && review.product.id.toString() === id
+        );
+        setReviews(productReviews);
+      } catch (err) {
+        console.error('Error fetching reviews:', err);
+        // Fallback to mock data if API fails
         setReviews([
           {
             id: 1,
@@ -70,8 +76,8 @@ const ProductView = () => {
             createdAt: '2024-01-10'
           }
         ]);
-      } catch (err) {
-        console.error('Error fetching reviews:', err);
+      } finally {
+        setReviewsLoading(false);
       }
     };
 
@@ -151,30 +157,32 @@ const ProductView = () => {
 
     setSubmittingReview(true);
     try {
-      // This would be your actual API call to submit the review
-      // const response = await axios.post(`http://localhost:8082/products/${id}/reviews`, {
-      //   rating: reviewForm.rating,
-      //   comment: reviewForm.comment,
-      //   userId: user.id
-      // });
-
-      // Mock successful review submission
-      const newReview = {
-        id: Date.now(),
-        user: { fullName: user.fullName || user.username },
+      // API call to submit the review
+      const reviewData = {
         rating: reviewForm.rating,
         comment: reviewForm.comment,
-        createdAt: new Date().toISOString().split('T')[0]
+        user: {
+          id: user.id
+        },
+        product: {
+          id: parseInt(id)
+        }
       };
 
-      setReviews(prevReviews => [newReview, ...prevReviews]);
+      const response = await axios.post('http://localhost:8082/review/user/add', reviewData);
+
+      // Refresh reviews after successful submission
+      await fetchReviews();
+      
       setReviewForm({ rating: 5, comment: '' });
       setShowReviewForm(false);
       
-      // You can add a success toast here
+      // Success message (you can replace this with a toast notification)
+      alert('Review submitted successfully!');
+      
     } catch (err) {
       console.error('Error submitting review:', err);
-      // You can add an error toast here
+      alert('Failed to submit review. Please try again.');
     } finally {
       setSubmittingReview(false);
     }
@@ -210,6 +218,25 @@ const ProductView = () => {
         <span className="ml-2 text-sm text-gray-600">({rating})</span>
       </div>
     );
+  };
+
+  // Function to refetch reviews
+  const fetchReviews = async () => {
+    try {
+      setReviewsLoading(true);
+      const response = await axios.get(`http://localhost:8082/review`);
+      
+      // Filter reviews for this specific product
+      const productReviews = response.data.filter(review => 
+        review.product && review.product.id.toString() === id
+      );
+      setReviews(productReviews);
+    } catch (err) {
+      console.error('Error fetching reviews:', err);
+      // Keep existing reviews if API call fails
+    } finally {
+      setReviewsLoading(false);
+    }
   };
 
   if (loading) {
@@ -515,20 +542,27 @@ const ProductView = () => {
             </div>
           )}
 
-          {/* Reviews List */}
-          {reviews.length > 0 ? (
+          {/* Reviews Loading State */}
+          {reviewsLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-3 text-gray-600">Loading reviews...</span>
+            </div>
+          ) : reviews.length > 0 ? (
             <div className="space-y-6">
               {reviews.map((review) => (
                 <div key={review.id} className="border-b border-gray-200 pb-6 last:border-b-0">
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <h4 className="font-semibold text-gray-900">{review.user.fullName}</h4>
+                      <h4 className="font-semibold text-gray-900">
+                        {review.user?.fullName || review.user?.username || 'Anonymous User'}
+                      </h4>
                       <div className="flex items-center mt-1">
                         {renderStarRating(review.rating)}
                       </div>
                     </div>
                     <span className="text-sm text-gray-500">
-                      {new Date(review.createdAt).toLocaleDateString()}
+                      {new Date(review.createdAt || review.createdDate).toLocaleDateString()}
                     </span>
                   </div>
                   <p className="text-gray-700 mt-2">{review.comment}</p>
@@ -562,7 +596,7 @@ const ProductView = () => {
             </div>
             <div className="text-center p-4 bg-orange-50 rounded-lg">
               <div className="text-orange-600 text-lg font-semibold">Price</div>
-              <div className="text-gray-900 text-xl font-bold mt-2">${product.price}</div>
+              <div className="text-gray-900 text-xl font-bold mt-2">Rs.{product.price}</div>
             </div>
           </div>
         </div>
