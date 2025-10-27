@@ -27,6 +27,9 @@ const Wishlist = lazy(() => import("./pages/Wishlist"));
 const Settings = lazy(() => import("./pages/Settings"));
 const ProductView = lazy(() => import("./pages/ProductView")); // Added ProductView
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AboutUs = lazy(() => import("./pages/AboutUs")); // Add this import
+const Contact = lazy(() => import("./pages/Contact")); // Add this import
+
 
 // Loading Spinner Component
 const LoadingSpinner = () => (
@@ -118,6 +121,8 @@ const useRouteTitle = () => {
       "/wishlist": "My Wishlist - GenZsport",
       "/settings": "Settings - GenZsport",
       "/products": "Products - GenZsport",
+       "/about": "About Us - GenZsport", // Add this
+      "/contact": "Contact Us - GenZsport", // Add this
     };
 
     // Handle dynamic product pages
@@ -191,7 +196,14 @@ const router = createBrowserRouter([
         index: true,
         element: <Home />,
       },
-
+       {
+        path: "about",
+        element: <AboutUs />,
+      },
+      {
+        path: "contact",
+        element: <Contact />,
+      },
       {
         path: "categories",
         element: <Categories />,

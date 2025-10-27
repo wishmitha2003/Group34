@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCartIcon, MenuIcon, XIcon, SearchIcon, UserIcon, HeartIcon, ChevronDownIcon } from 'lucide-react';
+import { ShoppingCartIcon, MenuIcon, XIcon, SearchIcon, UserIcon, HeartIcon, ChevronDownIcon, PhoneIcon, InfoIcon } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -49,6 +49,16 @@ const Header = () => {
       setSearchQuery('');
       setIsMenuOpen(false);
     }
+  };
+
+  const handleAboutClick = () => {
+    navigate('/about');
+    setIsMenuOpen(false);
+  };
+
+  const handleContactClick = () => {
+    navigate('/contact');
+    setIsMenuOpen(false);
   };
 
   // Get user's profile picture or generate initials
@@ -138,8 +148,6 @@ const Header = () => {
     </div>
   );
 
-
-
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
@@ -170,6 +178,24 @@ const Header = () => {
             >
               Category
             </Link>
+
+            {/* About Us Button */}
+            <button
+              onClick={handleAboutClick}
+              className="font-medium hover:text-blue-600 transition-colors flex items-center"
+            >
+              <InfoIcon className="h-4 w-4 mr-1" />
+              About Us
+            </button>
+
+            {/* Contact Button */}
+            <button
+              onClick={handleContactClick}
+              className="font-medium hover:text-blue-600 transition-colors flex items-center"
+            >
+              <PhoneIcon className="h-4 w-4 mr-1" />
+              Contact
+            </button>
           </nav>
 
           {/* Search, Cart, and Login */}
@@ -314,6 +340,24 @@ const Header = () => {
               >
                 Category
               </Link>
+
+              {/* About Us Button - Mobile */}
+              <button
+                onClick={handleAboutClick}
+                className="font-medium hover:text-blue-600 transition-colors py-2 border-b border-gray-100 flex items-center w-full text-left"
+              >
+                <InfoIcon className="h-5 w-5 mr-2" />
+                About Us
+              </button>
+
+              {/* Contact Button - Mobile */}
+              <button
+                onClick={handleContactClick}
+                className="font-medium hover:text-blue-600 transition-colors py-2 border-b border-gray-100 flex items-center w-full text-left"
+              >
+                <PhoneIcon className="h-5 w-5 mr-2" />
+                Contact
+              </button>
               
               {/* User Menu Items for Mobile - Only show if authenticated */}
               {isAuthenticated ? (
