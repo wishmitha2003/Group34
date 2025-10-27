@@ -23,12 +23,24 @@ public class OrderController {
     }
 
     @PostMapping("/place")
-    public ResponseEntity<Order> placeOrder(@RequestBody Order order, @AuthenticationPrincipal User user) {
+    public ResponseEntity<?> placeOrder(@RequestBody Order order, @AuthenticationPrincipal User user) {
         try {
+            if (user == null) {
+                return ResponseEntity.status(401).body("User not authenticated");
+            }
+            
+            if (order.getProduct() == null || order.getProduct().getId() == null) {
+                return ResponseEntity.badRequest().body("Product information is required");
+            }
+            
+            if (order.getQuantity() == null || order.getQuantity() <= 0) {
+                return ResponseEntity.badRequest().body("Valid quantity is required");
+            }
+            
             Order newOrder = orderService.placeOrder(order, user);
             return ResponseEntity.ok(newOrder);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("Order failed: " + e.getMessage());
         }
     }
 

@@ -324,7 +324,7 @@ const ProductView = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-baseline gap-4">
                   <span className="text-4xl font-bold text-blue-600">
-                    ${product.price}
+                    Rs.{product.price}
                   </span>
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                     product.stock > 0 

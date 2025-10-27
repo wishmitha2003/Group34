@@ -22,7 +22,7 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", nullable = false)
-    private AppService product; // Reference to AppService (product)
+    private Product product; // Reference to Product
 
     @Column(nullable = false)
     private Integer quantity;
@@ -40,7 +40,7 @@ public class Order {
     // Constructors
     public Order() {}
 
-    public Order(User user, AppService product, Integer quantity, Double price) {
+    public Order(User user, Product product, Integer quantity, Double price) {
         this.user = user;
         this.product = product;
         this.quantity = quantity;
@@ -63,8 +63,8 @@ public class Order {
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 
-    public AppService getProduct() { return product; }
-    public void setProduct(AppService product) { this.product = product; }
+    public Product getProduct() { return product; }
+    public void setProduct(Product product) { this.product = product; }
 
     public Integer getQuantity() { return quantity; }
     public void setQuantity(Integer quantity) { 
