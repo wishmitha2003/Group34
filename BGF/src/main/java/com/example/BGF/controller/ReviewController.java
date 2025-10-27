@@ -10,14 +10,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/review")
-@CrossOrigin(origins = "*")
 public class ReviewController {
 
     @Autowired
     private ReviewService reviewService;
 
     // --- Create Review ---
-    @PostMapping("/add")
+    @PostMapping("/user/add")
     public ResponseEntity<Review> createReview(@RequestBody Review review) {
         return ResponseEntity.ok(reviewService.saveReview(review));
     }
@@ -49,10 +48,10 @@ public class ReviewController {
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
-    // --- Get Reviews by Service ---
-    @GetMapping("/service/{serviceId}")
-    public ResponseEntity<List<Review>> getReviewsByService(@PathVariable Long serviceId) {
-        return ResponseEntity.ok(reviewService.getReviewsByService(serviceId));
+    // --- Get Reviews by Product ---
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<List<Review>> getReviewsByProduct(@PathVariable Long productId) {
+        return ResponseEntity.ok(reviewService.getReviewsByProduct(productId));
     }
 
     // --- Get Reviews by User ---
@@ -61,10 +60,10 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getReviewsByUser(userId));
     }
 
-    // --- Get Average Rating for Service ---
-    @GetMapping("/service/{serviceId}/average")
-    public ResponseEntity<Double> getAverageRating(@PathVariable Long serviceId) {
-        return ResponseEntity.ok(reviewService.getAverageRating(serviceId));
+    // --- Get Average Rating for Product ---
+    @GetMapping("/product/{productId}/average")
+    public ResponseEntity<Double> getAverageRating(@PathVariable Long productId) {
+        return ResponseEntity.ok(reviewService.getAverageRating(productId));
     }
 
     // --- Get All Reviews for Admin Dashboard ---
