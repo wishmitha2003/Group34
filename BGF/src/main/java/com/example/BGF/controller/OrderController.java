@@ -4,81 +4,78 @@ import com.example.BGF.models.Order;
 import com.example.BGF.models.User;
 import com.example.BGF.service.OrderService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
-@RequestMapping("/orders")
-@CrossOrigin(origins = "http://localhost:5174")
+@RequestMapping("/api/orders")
 public class OrderController {
 
     private final OrderService orderService;
-
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
 
-    @PostMapping("/place")
-    public ResponseEntity<?> placeOrder(@RequestBody Order order, @AuthenticationPrincipal User user) {
+    @PostMapping
+    public ResponseEntity<?> createOrder(@RequestBody Map<String, Object> orderData) {
         try {
-            if (user == null) {
-                return ResponseEntity.status(401).body("User not authenticated");
-            }
-            
-            if (order.getProduct() == null || order.getProduct().getId() == null) {
-                return ResponseEntity.badRequest().body("Product information is required");
-            }
-            
-            if (order.getQuantity() == null || order.getQuantity() <= 0) {
-                return ResponseEntity.badRequest().body("Valid quantity is required");
-            }
-            
-            Order newOrder = orderService.placeOrder(order, user);
-            return ResponseEntity.ok(newOrder);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body("Order failed: " + e.getMessage());
+            Long userId = Long.valueOf(orderData.get("userId").toString());
+            Long productId = Long.valueOf(orderData.get("productId").toString());
+            int quantity = Integer.parseInt(orderData.get("quantity").toString());
+            String shippingAddress = (String) orderData.get("shippingAddress");
+            String paymentMethod = (String) orderData.get("paymentMethod");
+            String notes = (String) orderData.getOrDefault("notes", "");
+
+            Order order = orderService.createOrder(userId, productId, quantity, shippingAddress, paymentMethod, notes);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Order created successfully",
+                    "order", order
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
-    @GetMapping("/user/all")
-    public ResponseEntity<List<Order>> getUserOrders(@AuthenticationPrincipal User user) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOrderById(@PathVariable Long id) {
+        return orderService.getOrderById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.badRequest().body((Order) Map.of("error", "Order not found")));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getOrdersByUser(@PathVariable Long userId) {
+        User user = new User();
+        user.setId(userId);
         return ResponseEntity.ok(orderService.getOrdersByUser(user));
     }
 
-    @GetMapping("/admin/all")
+    @GetMapping
     public ResponseEntity<List<Order>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
 
-    @GetMapping("/{orderId}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
-        Optional<Order> order = orderService.getOrderById(orderId);
-        return order.map(ResponseEntity::ok)
-                   .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PutMapping("/{orderId}/status")
-    public ResponseEntity<Order> updateOrderStatus(@PathVariable Long orderId, @RequestBody Map<String, String> statusUpdate) {
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> statusData) {
         try {
-            String status = statusUpdate.get("status");
-            Order updatedOrder = orderService.updateOrderStatus(orderId, status);
-            return ResponseEntity.ok(updatedOrder);
+            Order updated = orderService.updateOrderStatus(id, statusData.get("status"));
+            return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
-    @PutMapping("/{orderId}/cancel")
-    public ResponseEntity<Order> cancelOrder(@PathVariable Long orderId) {
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<?> cancelOrder(@PathVariable Long id) {
         try {
-            Order cancelledOrder = orderService.cancelOrder(orderId);
-            return ResponseEntity.ok(cancelledOrder);
+            Order cancelled = orderService.cancelOrder(id);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Order cancelled successfully",
+                    "order", cancelled
+            ));
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 }
