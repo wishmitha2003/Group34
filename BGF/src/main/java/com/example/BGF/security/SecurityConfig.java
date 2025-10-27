@@ -30,7 +30,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/profile/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/services/admin/**").hasRole("ADMIN")
                         .requestMatchers("/services/user/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/products/**").permitAll()
+                        .requestMatchers("/api/orders/**").permitAll()
                         .requestMatchers("/review/**").permitAll()
                         .anyRequest().authenticated()
                 )
