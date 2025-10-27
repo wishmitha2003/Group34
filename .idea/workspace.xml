@@ -6,10 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="4832ca4f-c815-4d78-bf01-40de74a702c4" name="Changes" comment="order process">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/security/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/src/pages/Categories.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/UI/src/pages/Categories.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/src/pages/ProductView.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/UI/src/pages/ProductView.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/src/services/productService.js" beforeDir="false" afterPath="$PROJECT_DIR$/UI/src/services/productService.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,7 +124,7 @@
       <workItem from="1761484717416" duration="165000" />
       <workItem from="1761485157569" duration="151000" />
       <workItem from="1761485484726" duration="282000" />
-      <workItem from="1761556015418" duration="11198000" />
+      <workItem from="1761556015418" duration="12131000" />
     </task>
     <task id="LOCAL-00001" summary="order process">
       <option name="closed" value="true" />
