@@ -32,7 +32,7 @@ export const productService = {
   // 🔹 Get all products
   getAllProducts: async () => {
     try {
-      const response = await api.get('/products/all');
+      const response = await api.get('/api/products');
       return response.data;
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -43,7 +43,7 @@ export const productService = {
   // 🔹 Get product by ID
   getProductById: async (id) => {
     try {
-      const response = await api.get(`/products/${id}`);
+      const response = await api.get(`/api/products/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -76,7 +76,7 @@ export const productService = {
   // 🔹 Search products by name
   searchProducts: async (name) => {
     try {
-      const response = await api.get(`/products/search?name=${encodeURIComponent(name)}`);
+      const response = await api.get(`/api/products/search?query=${encodeURIComponent(name)}`);
       return response.data;
     } catch (error) {
       console.error('Error searching products:', error);
@@ -87,10 +87,32 @@ export const productService = {
   // 🔹 Filter products by category
   filterByCategory: async (category) => {
     try {
-      const response = await api.get(`/products/filter?category=${encodeURIComponent(category)}`);
+      const response = await api.get(`/api/products/category/${encodeURIComponent(category)}`);
       return response.data;
     } catch (error) {
       console.error('Error filtering products by category:', error);
+      throw error;
+    }
+  },
+
+  // 🔹 Get all categories
+  getAllCategories: async () => {
+    try {
+      const response = await api.get('/api/categories');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      throw error;
+    }
+  },
+
+  // 🔹 Get products by category
+  getProductsByCategory: async (category) => {
+    try {
+      const response = await api.get(`/api/products/category/${encodeURIComponent(category)}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching products by category:', error);
       throw error;
     }
   },
