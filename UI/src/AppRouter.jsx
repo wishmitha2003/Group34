@@ -7,6 +7,7 @@ import { useAuth } from './context/AuthContext';
 // Lazy load components for better performance
 const Home = React.lazy(() => import('./pages/Home'));
 const Categories = React.lazy(() => import('./pages/Categories'));
+const ProductView = React.lazy(() => import('./pages/ProductView'));
 const Cart = React.lazy(() => import('./pages/Cart'));
 const Login = React.lazy(() => import('./pages/Login'));
 const SignUp = React.lazy(() => import('./pages/Signup'));
@@ -84,6 +85,7 @@ export function AppRouter() {
           <Route index element={<Home />} />
           <Route path="categories/:category" element={<Categories />} />
           <Route path="categories" element={<Categories />} />
+          <Route path="product/:id" element={<ProductView />} />
           <Route path="cart" element={<Cart />} />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<SignUp />} />

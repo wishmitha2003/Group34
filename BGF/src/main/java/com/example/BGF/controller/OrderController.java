@@ -8,9 +8,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/orders")
+@CrossOrigin(origins = "http://localhost:5174")
 public class OrderController {
 
     private final OrderService orderService;
@@ -19,10 +22,26 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @PostMapping("/user/place")
-    public ResponseEntity<Order> placeOrder(@RequestBody Order order, @AuthenticationPrincipal User user) {
-        Order newOrder = orderService.placeOrder(order, user);
-        return ResponseEntity.ok(newOrder);
+    @PostMapping("/place")
+    public ResponseEntity<?> placeOrder(@RequestBody Order order, @AuthenticationPrincipal User user) {
+        try {
+            if (user == null) {
+                return ResponseEntity.status(401).body("User not authenticated");
+            }
+            
+            if (order.getProduct() == null || order.getProduct().getId() == null) {
+                return ResponseEntity.badRequest().body("Product information is required");
+            }
+            
+            if (order.getQuantity() == null || order.getQuantity() <= 0) {
+                return ResponseEntity.badRequest().body("Valid quantity is required");
+            }
+            
+            Order newOrder = orderService.placeOrder(order, user);
+            return ResponseEntity.ok(newOrder);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Order failed: " + e.getMessage());
+        }
     }
 
     @GetMapping("/user/all")
@@ -33,5 +52,33 @@ public class OrderController {
     @GetMapping("/admin/all")
     public ResponseEntity<List<Order>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
+    }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
+        Optional<Order> order = orderService.getOrderById(orderId);
+        return order.map(ResponseEntity::ok)
+                   .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{orderId}/status")
+    public ResponseEntity<Order> updateOrderStatus(@PathVariable Long orderId, @RequestBody Map<String, String> statusUpdate) {
+        try {
+            String status = statusUpdate.get("status");
+            Order updatedOrder = orderService.updateOrderStatus(orderId, status);
+            return ResponseEntity.ok(updatedOrder);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/{orderId}/cancel")
+    public ResponseEntity<Order> cancelOrder(@PathVariable Long orderId) {
+        try {
+            Order cancelledOrder = orderService.cancelOrder(orderId);
+            return ResponseEntity.ok(cancelledOrder);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

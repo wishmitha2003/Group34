@@ -27,9 +27,15 @@ const ProductView = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8082/products/${id}`);
-        setProduct(response.data);
-        setError(null);
+        const response = await axios.get(`http://localhost:8082/api/products`);
+        // Find the product with matching ID from the list
+        const foundProduct = response.data.find(p => p.id.toString() === id);
+        if (foundProduct) {
+          setProduct(foundProduct);
+          setError(null);
+        } else {
+          setError('Product not found');
+        }
         
         // Fetch reviews for this product
         await fetchReviews();
@@ -84,12 +90,21 @@ const ProductView = () => {
       return;
     }
 
-    if (product.stock === 0) return;
+    if ((product.stock || 0) === 0) return;
 
     setAddingToCart(true);
     try {
-      await addToCart(product.id, 1);
-      // You can add a toast notification here
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.imageUrl,
+        quantity: 1,
+        category: product.category
+      });
+      
+      // Navigate to cart page after adding
+      navigate('/cart');
     } catch (err) {
       console.error('Error adding to cart:', err);
     } finally {
@@ -103,8 +118,18 @@ const ProductView = () => {
       return;
     }
     
-    if (product.stock > 0) {
-      // You can implement direct checkout logic here
+    if ((product.stock || 0) > 0) {
+      // Add product to cart first
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.imageUrl,
+        quantity: 1,
+        category: product.category
+      });
+      
+      // Navigate to checkout
       navigate('/checkout');
     }
   };
@@ -299,7 +324,7 @@ const ProductView = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-baseline gap-4">
                   <span className="text-4xl font-bold text-blue-600">
-                    ${product.price}
+                    Rs.{product.price}
                   </span>
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                     product.stock > 0 
@@ -325,9 +350,9 @@ const ProductView = () => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <button 
                   onClick={handleAddToCart}
-                  disabled={product.stock === 0 || addingToCart}
+                  disabled={(product.stock || 0) === 0 || addingToCart}
                   className={`flex-1 py-3 px-6 rounded-lg font-semibold text-white transition duration-200 ${
-                    product.stock > 0 && !addingToCart
+                    (product.stock || 0) > 0 && !addingToCart
                       ? 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
                       : 'bg-gray-400 cursor-not-allowed'
                   }`}
@@ -338,14 +363,14 @@ const ProductView = () => {
                       Adding...
                     </span>
                   ) : (
-                    product.stock > 0 ? 'Add to Cart' : 'Out of Stock'
+                    (product.stock || 0) > 0 ? 'Add to Cart' : 'Out of Stock'
                   )}
                 </button>
                 <button 
                   onClick={handleBuyNow}
-                  disabled={product.stock === 0}
+                  disabled={(product.stock || 0) === 0}
                   className={`flex-1 py-3 px-6 rounded-lg font-semibold text-white transition duration-200 ${
-                    product.stock > 0
+                    (product.stock || 0) > 0
                       ? 'bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2'
                       : 'bg-gray-400 cursor-not-allowed'
                   }`}

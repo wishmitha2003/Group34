@@ -1,15 +1,56 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingBagIcon } from 'lucide-react';
 import CategoryCard from '../components/CategoryCard';
 import ProductCard from '../components/ProductCard';
-import { categories, products } from '../data/products';
+import productService from '../services/productService';
 
 const Home = () => {
-  // Get featured products (one from each category)
-  const featuredProducts = categories
-    .map(category => products.find(product => product.category === category.slug))
-    .filter(Boolean);
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [categoriesData, productsData] = await Promise.all([
+          productService.getAllCategories(),
+          productService.getAllProducts()
+        ]);
+        
+        setCategories(categoriesData);
+        setProducts(productsData);
+        
+        // Get featured products (first few products or one from each category)
+        const featured = productsData.slice(0, 4);
+        setFeaturedProducts(featured);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return React.createElement(
+      'div',
+      { className: 'w-full flex justify-center items-center min-h-screen' },
+      React.createElement(
+        'div',
+        { className: 'flex flex-col items-center' },
+        React.createElement(
+          'div',
+          { className: 'animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4' }
+        ),
+        React.createElement('div', { className: 'text-xl text-gray-600' }, 'Loading...')
+      )
+    );
+  }
 
   return React.createElement(
     'div',
@@ -122,8 +163,9 @@ const Home = () => {
               name: product.name,
               description: product.description,
               price: product.price,
-              image: product.image,
-              category: product.category
+              image: product.imageUrl,
+              category: product.category,
+              remainingStocks: product.stock
             })
           )
         )
