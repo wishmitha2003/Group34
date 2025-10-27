@@ -80,6 +80,49 @@ const AdminDashboard = () => {
     navigate('/admin/add-product');
   };
 
+  // Edit Product Function
+  const handleEditProduct = (productId) => {
+    // Navigate to edit product page or open edit modal
+    navigate(`/admin/edit-product/${productId}`);
+    // Alternatively, you can implement an inline edit or modal here
+    console.log('Edit product:', productId);
+    alert(`Edit functionality for product ${productId} would be implemented here`);
+  };
+
+  // Delete Product Function
+  const handleDeleteProduct = async (productId, productName) => {
+    if (!window.confirm(`Are you sure you want to delete "${productName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await api.delete(`/products/admin/delete/${productId}`);
+      
+      if (response.status === 200) {
+        // Remove product from local state
+        setProducts(prevProducts => prevProducts.filter(product => product.id !== productId));
+        
+        // Update stats
+        setStats(prevStats => ({
+          ...prevStats,
+          totalProducts: prevStats.totalProducts - 1
+        }));
+        
+        alert('Product deleted successfully!');
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      if (error.response) {
+        alert(`Failed to delete product: ${error.response.data.message || 'Server error'}`);
+      } else {
+        alert('Failed to delete product. Please check your connection.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Enhanced Dashboard Tab
   const DashboardTab = () => (
     <div className="space-y-6">
@@ -249,7 +292,15 @@ const AdminDashboard = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-lg flex items-center justify-center">
-                      <span className="text-gray-500 text-sm">IMG</span>
+                      {product.image ? (
+                        <img 
+                          src={product.image} 
+                          alt={product.name}
+                          className="h-10 w-10 rounded-lg object-cover"
+                        />
+                      ) : (
+                        <span className="text-gray-500 text-sm">IMG</span>
+                      )}
                     </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">{product.name}</div>
@@ -269,7 +320,7 @@ const AdminDashboard = () => {
                     product.stock > 0 ? 'bg-yellow-100 text-yellow-800' : 
                     'bg-red-100 text-red-800'
                   }`}>
-                    {product.stock} in stock
+                    {product.stock || 0} in stock
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -280,8 +331,19 @@ const AdminDashboard = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button className="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
-                  <button className="text-red-600 hover:text-red-900">Delete</button>
+                  <button 
+                    onClick={() => handleEditProduct(product.id)}
+                    className="text-indigo-600 hover:text-indigo-900 mr-3 px-3 py-1 rounded hover:bg-indigo-50 transition-colors"
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteProduct(product.id, product.name)}
+                    className="text-red-600 hover:text-red-900 px-3 py-1 rounded hover:bg-red-50 transition-colors"
+                    disabled={loading}
+                  >
+                    {loading ? 'Deleting...' : 'Delete'}
+                  </button>
                 </td>
               </tr>
             ))}
