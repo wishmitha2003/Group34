@@ -25,11 +25,13 @@ const Categories = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
+
+        // Fetch products and categories simultaneously
         const [productsData, categoriesData] = await Promise.all([
           productService.getAllProducts(),
           productService.getAllCategories()
         ]);
-        
+
         setAllProducts(productsData);
         setCategories(categoriesData);
         setError(null);

@@ -188,7 +188,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Call backend API for login
-      const response = await api.post('/api/login', {
+      const response = await api.post('/auth/login', {
         username: username,
         password: password
       });
@@ -324,7 +324,7 @@ export const AuthProvider = ({ children }) => {
       console.log('Update Profile - Data:', userData);
       
       // Call backend API to update profile
-      const response = await api.put(`/api/profile/${user.id}`, {
+      const response = await api.put(`/auth/profile/${user.id}`, {
         fullName: userData.name || userData.fullName,
         email: userData.email,
         phone: userData.phone,
@@ -378,7 +378,7 @@ export const AuthProvider = ({ children }) => {
       console.log('User ID:', user.id);
       
       // Call backend API to get latest profile data
-      const response = await api.get(`/api/profile/${user.id}`);
+      const response = await api.get(`/auth/profile/${user.id}`);
       
       if (response.status === 200) {
         const userData = response.data;
