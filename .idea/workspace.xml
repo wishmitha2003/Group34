@@ -4,14 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-
-    <list default="true" id="4832ca4f-c815-4d78-bf01-40de74a702c4" name="Changes" comment="order process" />
-
     <list default="true" id="4832ca4f-c815-4d78-bf01-40de74a702c4" name="Changes" comment="order process">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/src/pages/AdminDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/UI/src/pages/AdminDashboard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/security/CorsConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/security/CorsConfig.java" afterDir="false" />
     </list>
-
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -70,11 +66,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Spring Boot.BgfApplication.executor&quot;: &quot;Run&quot;,
-
     &quot;git-widget-placeholder&quot;: &quot;wishmitha's-Branch&quot;,
-
-    &quot;git-widget-placeholder&quot;: &quot;Dasun's-Branch&quot;,
-
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
@@ -124,10 +116,8 @@
       <workItem from="1760853120603" duration="64000" />
       <workItem from="1760885429470" duration="1463000" />
       <workItem from="1761316335684" duration="872000" />
-
       <workItem from="1761468926405" duration="4905000" />
       <workItem from="1761498722323" duration="277000" />
-
       <workItem from="1761320889289" duration="77000" />
       <workItem from="1761321090043" duration="99000" />
       <workItem from="1761321213807" duration="90000" />
@@ -138,7 +128,7 @@
       <workItem from="1761485157569" duration="151000" />
       <workItem from="1761485484726" duration="282000" />
       <workItem from="1761556015418" duration="12131000" />
-
+      <workItem from="1761621088213" duration="1004000" />
     </task>
     <task id="LOCAL-00001" summary="order process">
       <option name="closed" value="true" />
