@@ -44,19 +44,19 @@ const Contact = () => {
     {
       icon: <PhoneIcon className="h-6 w-6" />,
       title: "Phone",
-      details: "+1 (555) 123-4567",
+      details: "+94705777945",
       description: "Mon to Fri 9am to 6pm"
     },
     {
       icon: <MailIcon className="h-6 w-6" />,
       title: "Email",
-      details: "support@genzsport.com",
-      description: "Send us your query anytime!"
+      details: "onlinegenzsport@gmail.com",
+      description: "Send us your idea anytime!"
     },
     {
       icon: <MapPinIcon className="h-6 w-6" />,
       title: "Office",
-      details: "123 Sports Avenue, City, State 12345",
+      details: "Kaikawala,Induruwa,SriLanka",
       description: "Visit our headquarters"
     },
     {
