@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
@@ -116,8 +117,10 @@ const Signup = () => {
         serviceType: "Premium" // Adding serviceType as per your backend requirement
       };
 
-      const response = await axios.post(
-        "http://localhost:8082/api/signup",
+      // Use shared axios instance (adds baseURL and auth header) and
+      // call the backend register endpoint that the Spring app exposes.
+      const response = await api.post(
+        "/auth/register",
         submitData
       );
 
@@ -247,6 +250,7 @@ const Signup = () => {
               type="password"
               name="password"
               placeholder="Create a password"
+              autoComplete="new-password"
               value={formData.password}
               onChange={handleChange}
               className={getInputClassName("password")}

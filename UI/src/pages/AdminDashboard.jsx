@@ -312,7 +312,7 @@ const AdminDashboard = () => {
                   {product.category || 'Uncategorized'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                  Rs. {product.price}
+                  Rs.{product.price}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
