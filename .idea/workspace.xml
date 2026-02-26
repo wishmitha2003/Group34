@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4832ca4f-c815-4d78-bf01-40de74a702c4" name="Changes" comment="order process">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/security/CorsConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/BGF/src/main/java/com/example/BGF/security/CorsConfig.java" afterDir="false" />
-    </list>
+    <list default="true" id="4832ca4f-c815-4d78-bf01-40de74a702c4" name="Changes" comment="order process" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -129,6 +126,7 @@
       <workItem from="1761485484726" duration="282000" />
       <workItem from="1761556015418" duration="12131000" />
       <workItem from="1761621088213" duration="1004000" />
+      <workItem from="1769968148292" duration="62000" />
     </task>
     <task id="LOCAL-00001" summary="order process">
       <option name="closed" value="true" />
